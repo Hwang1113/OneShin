@@ -1,6 +1,5 @@
-using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
+
 
 public class FourByFour : MonoBehaviour
 {
@@ -9,7 +8,6 @@ public class FourByFour : MonoBehaviour
 
     private float Bpm = 0f; //60bpm 1분에 60번, 1초 1번
 
-    
     private void Awake()
     {
         UINMg = GetComponentInChildren<ONEShin_UINoteManager>();
