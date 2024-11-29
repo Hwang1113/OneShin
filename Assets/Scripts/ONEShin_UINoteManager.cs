@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ONEShin_UIManager : MonoBehaviour
+public class ONEShin_UINoteManager : MonoBehaviour
 {
     private Image Hitbox = null;
     private Image Notebox = null;
@@ -12,5 +12,9 @@ public class ONEShin_UIManager : MonoBehaviour
         Notebox = Hitbox.GetComponentInChildren<Image>();
         if (Hitbox != null && Notebox != null)
             Debug.Log("Hit Note ºÒ·¯¿È");
+    }
+    public void MoveNoteToHit()
+    {
+        Notebox.rectTransform.anchoredPosition = Hitbox.rectTransform.anchoredPosition;
     }
 }
