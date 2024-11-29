@@ -36,7 +36,7 @@ public class ONEShin_UINoteManager : MonoBehaviour
     private IEnumerator MoveNoteToHitCoroutine(Image _Notebox)
     {
         //Notebox.rectTransform.anchoredPosition = Hitbox.rectTransform.anchoredPosition;
-        Notebox.gameObject.SetActive(true);
+        _Notebox.gameObject.SetActive(true);
         float time = 0f;
         while (time < 1f)
         {
