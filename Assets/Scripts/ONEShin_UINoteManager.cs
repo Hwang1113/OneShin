@@ -6,7 +6,7 @@ public class ONEShin_UINoteManager : MonoBehaviour
 {
     private Image Hitbox = null;
     private Image Notebox = null;
-    private float time = 0f;
+    private float Stoptiming = 0f;
     private Vector2 NoteboxStartPoint = Vector2.zero;
     private float HitboxWidth = 0f;
     private Vector2 NoteBoxEndPoint = Vector2.zero;
@@ -29,34 +29,34 @@ public class ONEShin_UINoteManager : MonoBehaviour
     private IEnumerator MoveNoteToHitCoroutine()
     {
         //Notebox.rectTransform.anchoredPosition = Hitbox.rectTransform.anchoredPosition;
-        time = 0f;
-        while (true)
+        Notebox.gameObject.SetActive(true);
+        float time = 0f;
+        while (time < 1f)
         {
             Notebox.rectTransform.anchoredPosition = Vector3.Lerp(NoteboxStartPoint, NoteBoxEndPoint, time);
+            if (time > 1f)
+            {
+                time = 1f;
+            }
+            Stoptiming = time;
             time += Time.deltaTime;
-            Debug.Log(NoteboxStartPoint + "" + NoteBoxEndPoint + "" + time);
-            if (time >= 1f) 
-                break;
             yield return null;
         }
-
+        Notebox.rectTransform.anchoredPosition = NoteBoxEndPoint;
     }
     #endregion
     #region public
     public void HitNote()
     {
         Notebox.gameObject.SetActive(false);
-        StopCoroutine(MoveNoteToHitCoroutine());
-        Debug.Log("∏ÿ√·time" + time);
+
+        Debug.Log("∏ÿ√·time" + Stoptiming);
     }
 
     public void PushNote()
     {
-        Notebox.rectTransform.anchoredPosition = NoteboxStartPoint;
-        time = 0f;
-        Notebox.gameObject.SetActive(true);
+
         MoveNoteToHit();
     }
     #endregion
-
 }
