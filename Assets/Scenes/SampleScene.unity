@@ -784,9 +784,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a6baff45f4ccaa4190673e1a6e8673c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Bpm: 60
-  Duration: 2
-  Panell: {fileID: 97719961}
+  UINMg: {fileID: 0}
 --- !u!1 &1766224065
 GameObject:
   m_ObjectHideFlags: 0
