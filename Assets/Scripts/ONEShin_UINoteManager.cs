@@ -38,9 +38,10 @@ public class ONEShin_UINoteManager : MonoBehaviour
         //Notebox.rectTransform.anchoredPosition = Hitbox.rectTransform.anchoredPosition;
         _Notebox.gameObject.SetActive(true);
         float time = 0f;
-        while (time < 1f)
+        while (time < 1f && _Notebox != null)
         {
-            _Notebox.rectTransform.anchoredPosition = Vector3.Lerp(NoteboxStartPoint, NoteBoxEndPoint, time);
+            if(_Notebox != null)
+                _Notebox.rectTransform.anchoredPosition = Vector3.Lerp(NoteboxStartPoint, NoteBoxEndPoint, time);
             if (time > 1f)
             {
                 time = 1f;
@@ -49,15 +50,19 @@ public class ONEShin_UINoteManager : MonoBehaviour
             time += Time.deltaTime;
             yield return null;
         }
-        _Notebox.rectTransform.anchoredPosition = NoteBoxEndPoint;
-        HitNote();
+        if (_Notebox != null)
+        {
+            _Notebox.rectTransform.anchoredPosition = NoteBoxEndPoint;
+            HitNote();
+        }
     }
     #endregion
     #region public
     public void HitNote()
     {
         //Notebox.gameObject.SetActive(false);
-        if (NoteQueue.Count > 0)
+
+        if (NoteQueue.Count > 0 && NoteQueue != null)
         {
             Image go = null;
             if (NoteQueue.TryDequeue(out go))
