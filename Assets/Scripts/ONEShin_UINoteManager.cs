@@ -21,6 +21,7 @@ public class ONEShin_UINoteManager : MonoBehaviour
         Notebox = Hitbox.GetComponentsInChildren<Image>()[1];
         NoteboxStartPoint = Notebox.rectTransform.anchoredPosition; // 노트박스가 화면으로 나오기 전 위치 (시작지점)
         NoteBoxEndPoint = Hitbox.rectTransform.anchoredPosition + new Vector2(-HitboxWidth, 0f); // 노트박스가 화면 밖에 나올 위치 (엔딩지점)
+
         NoteQueue = new Queue<Image>(); //노트 담을 큐 리스트
 
     }
