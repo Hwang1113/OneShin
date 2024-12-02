@@ -19,15 +19,9 @@ public class FourByFour : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Q)) // 
-            UINMg.HitQNote();
-        if (Input.GetKeyDown(KeyCode.W)) // 
-            UINMg.HitQNote();
-        if (Input.GetKeyDown(KeyCode.E)) // 
-            UINMg.HitQNote();
-        if (Input.GetKeyDown(KeyCode.R)) // 
-            UINMg.HitQNote();
+        if (Input.GetKeyDown(KeyCode.R)) 
+            UINMg.HitNoteR();
         if (Input.GetKeyDown(KeyCode.P))
-            UINMg.PushNote();
+            UINMg.PushNoteR();
     }
 }
