@@ -25,15 +25,15 @@ public class ONEShin_UINoteManager : MonoBehaviour
 
     }
     #region private
-    private void MoveNoteToHit()  //////// 노트를 생성하고, 시작 지점(NoteboxStartPoint) 부터 히트박스 뒤(NoteBoxEndPoint) 까지 움직인다.
+    private void CreateMoveNoteToHit()  //////// 노트를 생성하고, 시작 지점(NoteboxStartPoint) 부터 히트박스 뒤(NoteBoxEndPoint) 까지 움직인다.
     {
 
         Image noteGo = Instantiate(Notebox, Hitbox.transform);
         NoteQueue.Enqueue(noteGo);
-        StartCoroutine(MoveNoteToHitCoroutine(noteGo));
+        StartCoroutine(CreateMoveNoteToHitCoroutine(noteGo));
     }
     
-    private IEnumerator MoveNoteToHitCoroutine(Image _Notebox)
+    private IEnumerator CreateMoveNoteToHitCoroutine(Image _Notebox)
     {
         //Notebox.rectTransform.anchoredPosition = Hitbox.rectTransform.anchoredPosition;
         _Notebox.gameObject.SetActive(true);
@@ -73,10 +73,17 @@ public class ONEShin_UINoteManager : MonoBehaviour
                     Destroy(go.gameObject);
             }
             if (NoteQueue.Count >= 0)
+                if(0.5 <= Stoptiming &&   Stoptiming < 0.7)
+                    Debug.Log(Stoptiming + "Bad");
+                else if (0.7 <= Stoptiming && Stoptiming < 0.8)
+                    Debug.Log(Stoptiming + "Good");                
+                else if (0.8 <= Stoptiming && Stoptiming < 0.9 )
+                    Debug.Log(Stoptiming + "Perfect");
+                else if (0.9 <= Stoptiming && Stoptiming < 1 )
+                    Debug.Log(Stoptiming + "Good");
 
-                Debug.Log(Stoptiming);
             //이상 ~ 미만 기준임 
-            // 0.5이하는 무판정  Bad 0.5 ~ 0.6, Good 0.6 ~ 0.75, Perfect 0.75 ~ 0.9, Good 0.9 ~ 1 1이상이 되면 0.5로 자동 치환 그래서 Bad 판정후 노트 사라짐
+            // 0.5이하는 무판정 , Bad 0.5 ~ 0.7, Good 0.7 ~ 0.8, Perfect 0.8 ~ 0.9, Good 0.9 ~ 1   1이상이 되면 0.5로 자동 치환 그래서 Bad 판정후 노트 사라짐
 
         }
 
@@ -85,7 +92,8 @@ public class ONEShin_UINoteManager : MonoBehaviour
 
     public void PushNote() //노트 생성
     {
-        MoveNoteToHit();
+        CreateMoveNoteToHit();
     }
+
     #endregion
 }
