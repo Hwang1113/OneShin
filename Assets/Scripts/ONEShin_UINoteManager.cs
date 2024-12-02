@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Collections.Generic;
+using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,7 +12,7 @@ public class ONEShin_UINoteManager : MonoBehaviour
     private Vector2 NoteboxStartPoint = Vector2.zero;
     private float HitboxWidth = 0f;
     private Vector2 NoteBoxEndPoint = Vector2.zero;
-
+    private Queue<Image> NoteQueue = null; 
     private void Awake()
     {
         Hitbox = GetComponentInChildren<Image>();
@@ -19,21 +21,26 @@ public class ONEShin_UINoteManager : MonoBehaviour
         Notebox = Hitbox.GetComponentsInChildren<Image>()[1];
         NoteboxStartPoint = Notebox.rectTransform.anchoredPosition; // 노트박스가 화면으로 나오기 전 위치
         NoteBoxEndPoint = Hitbox.rectTransform.anchoredPosition + new Vector2(-HitboxWidth, 0f); // 노트박스가 화면 밖에 나올 위치
+        NoteQueue = new Queue<Image>();
+
     }
     #region private
     private void MoveNoteToHit()
     {
-        StartCoroutine(MoveNoteToHitCoroutine());
+
+        Image noteGo = Instantiate(Notebox, Hitbox.transform);
+        NoteQueue.Enqueue(noteGo);
+        StartCoroutine(MoveNoteToHitCoroutine(noteGo));
     }
     
-    private IEnumerator MoveNoteToHitCoroutine()
+    private IEnumerator MoveNoteToHitCoroutine(Image _Notebox)
     {
         //Notebox.rectTransform.anchoredPosition = Hitbox.rectTransform.anchoredPosition;
-        Notebox.gameObject.SetActive(true);
+        _Notebox.gameObject.SetActive(true);
         float time = 0f;
         while (time < 1f)
         {
-            Notebox.rectTransform.anchoredPosition = Vector3.Lerp(NoteboxStartPoint, NoteBoxEndPoint, time);
+            _Notebox.rectTransform.anchoredPosition = Vector3.Lerp(NoteboxStartPoint, NoteBoxEndPoint, time);
             if (time > 1f)
             {
                 time = 1f;
@@ -42,20 +49,24 @@ public class ONEShin_UINoteManager : MonoBehaviour
             time += Time.deltaTime;
             yield return null;
         }
-        Notebox.rectTransform.anchoredPosition = NoteBoxEndPoint;
+        _Notebox.rectTransform.anchoredPosition = NoteBoxEndPoint;
+        HitNote();
     }
     #endregion
     #region public
     public void HitNote()
     {
-        Notebox.gameObject.SetActive(false);
-
-        Debug.Log("멈춘time" + Stoptiming);
+        //Notebox.gameObject.SetActive(false);
+        if (NoteQueue.Count > 0)
+        {
+            Image go = null;
+            if (NoteQueue.TryDequeue(out go))
+                Destroy(go.gameObject);
+        }
     }
 
     public void PushNote()
     {
-
         MoveNoteToHit();
     }
     #endregion
