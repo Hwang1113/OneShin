@@ -6,7 +6,6 @@ public class FourByFour : MonoBehaviour
     private ONEShin_UINoteManager1 UINMg = null;
 
 
-
     public AudioSource audioSource = null;
 
     private void Awake()
@@ -17,7 +16,7 @@ public class FourByFour : MonoBehaviour
     private void Start()
     {
         UINMg.Score0();
-
+        UINMg.SetBpm(120); //120 BPM ¼³Á¤
         sampleNotesComming();
     }
 
@@ -48,8 +47,11 @@ public class FourByFour : MonoBehaviour
     private void sampleNotesComming()
     {
         int[] sampleQWER = { 1, 0, 1, 0 };
+        int[] sampleQWER1 = { 0, 1, 1, 1 };
         float[] sampleBarNBeat = { 1f, 0f };
+        float[] sampleBarNBeat1 = { 2f, 2f };
         UINMg.WhenPushNotes(sampleQWER, sampleBarNBeat);
+        UINMg.WhenPushNotes(sampleQWER1, sampleBarNBeat1);
         //Debug.Log("sampleNotesComming");
     }
 

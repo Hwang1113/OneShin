@@ -135,16 +135,28 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     public void PushNotes(int[] _QWER) // QWER[] 형식으로 노트를 동시에 보냄
     {
         if (_QWER[0] == 1)
-            PushNote(0);
+        {
+            PushNote(2);
+            Debug.Log("Push Q");
+        }
 
         if (_QWER[1] == 1)
-            PushNote(1);
+        {
+            PushNote(3);
+            Debug.Log("Push W");
+        }
 
         if (_QWER[2] == 1)
-            PushNote(2);
+        {
+            PushNote(1);
+            Debug.Log("Push E");
+        }
 
         if (_QWER[3] == 1)
-            PushNote(3);
+        {
+            PushNote(0);
+            Debug.Log("Push R");
+        }
     }
     public void WhenPushNotes(int[] _QWER, float[] _barNBeat)
     {
@@ -156,18 +168,19 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         float beat = 0f;
         while (true)
         {
-            Debug.Log(bar + " "+ beat);
+            //Debug.Log(bar + " "+ beat);
             beat += Time.deltaTime * Bpm * 0.01f;
             if (beat > 4)
             {
                 beat %= 4;
                 bar++;
+                Debug.Log(bar + " " + beat);
             }
 
             if (bar >= _barNBeat[0] && beat >= _barNBeat[1])
             {
                 PushNotes(_QWER);
-                Debug.Log("진짜옴");
+                Debug.Log("노트 옴");
                 yield break;
             }
             yield return null;
@@ -180,6 +193,10 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     public void Score0()
     {
         Score = 0;
+    }
+    public void SetBpm(float _BPM)
+    {
+        Bpm = _BPM;
     }
     #endregion
 }
