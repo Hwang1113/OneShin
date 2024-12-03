@@ -12,6 +12,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     private List<Vector2> NoteBoxEndPoints = new List<Vector2>(); // 각 노트 타입의 끝 위치를 리스트로 관리
     private List<Queue<Image>> NoteQueues = new List<Queue<Image>>(); // 각 노트 타입의 큐를 리스트로 관리
     private float Bpm = 0f; //60bpm 1분에 60번, 1초 1번
+    private float ComboCnt = 0f; //콤보 카운트
     
     private void Awake()
     {
@@ -73,7 +74,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     #endregion
 
     #region public
-    // 노트 판정 함수
+    // 노트 판정 함수 (퍼펙, 굿 경우 콤보카운트++, 배드는 0으로 초기화)
     public void HitNote(int noteIndex)
     {
         if (Stoptimings[noteIndex] >= 0.4f)
@@ -88,13 +89,26 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
             if (NoteQueues[noteIndex].Count >= 0)
             {
                 if (0.4 <= Stoptimings[noteIndex] && Stoptimings[noteIndex] < 0.6)
+                {
                     Debug.Log(Stoptimings[noteIndex] + " Bad");
+                    ComboCnt = 0;
+                }
+
                 else if (0.6 <= Stoptimings[noteIndex] && Stoptimings[noteIndex] < 0.75)
-                    Debug.Log(Stoptimings[noteIndex] + " Good");
+                {
+                    ComboCnt++;
+                    Debug.Log(Stoptimings[noteIndex] + " Good Combo: " + ComboCnt);
+                }
                 else if (0.75 <= Stoptimings[noteIndex] && Stoptimings[noteIndex] < 0.85)
-                    Debug.Log(Stoptimings[noteIndex] + " Perfect");
+                {
+                    ComboCnt++;
+                    Debug.Log(Stoptimings[noteIndex] + " Perfect Combo: " + ComboCnt);
+                }
                 else if (0.85 <= Stoptimings[noteIndex] && Stoptimings[noteIndex] < 1)
-                    Debug.Log(Stoptimings[noteIndex] + " Good");
+                {  
+                    ComboCnt++;
+                    Debug.Log(Stoptimings[noteIndex] + " Good! Combo: " + ComboCnt);
+                }
             }
         }
     }
