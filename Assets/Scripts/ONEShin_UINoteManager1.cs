@@ -1,21 +1,37 @@
+using Melanchall.DryWetMidi.Interaction;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class ONEShin_UINoteManager1 : MonoBehaviour
 {
+    #region private 변수
     private List<Image> Hitboxes = new List<Image>(); // Q, W, E, R에 대한 히트박스를 리스트로 관리
     private List<Image> Noteboxes = new List<Image>(); // Q, W, E, R에 대한 노트박스를 리스트로 관리
     private float[] Stoptimings = new float[4]; // 스탑 타이밍 배열
     private List<Vector2> NoteboxStartPoints = new List<Vector2>(); // 각 노트 타입의 시작 위치를 리스트로 관리
     private List<Vector2> NoteBoxEndPoints = new List<Vector2>(); // 각 노트 타입의 끝 위치를 리스트로 관리
     private List<Queue<Image>> NoteQueues = new List<Queue<Image>>(); // 각 노트 타입의 큐를 리스트로 관리
-    private float Bpm = 0f; //60bpm 1분에 60번, 1초 1번
-    private float ComboCnt = 0f; //콤보 카운트
-    
+    #endregion
+    #region public 변수
+    public int ComboCnt = 0; //콤보 카운트
+    public int Score = 0; // 점수 
+    public float Bpm = 60; // 음악 템포 또는 BPM 형식
+    public float[] barNBeat = { 0, 0 }; // 몇마디 몇박에 나올지 형식 {bar,beat}
+    public float maxBeat = 4f;  //4분의 4박자면 4를 입력 , 4분의 3박자면 3을 입력
+    public int[] QWER = { 0, 0, 0, 0 }; // 어떤 노트가 동시에 나올지 형식
+
+
+    #endregion
+    //public FourByFour SongManager = null;
+    //public Melanchall.DryWetMidi.MusicTheory.NoteName noteRestriction;
+    //public List<double> timeStamps = new List<double>();
+    //public static FourByFour Instance;
     private void Awake()
     {
+      
         // Q, W, E, R에 대한 Hitbox와 Notebox 초기화
         for (int i = 0; i < 4; i++)
         {
@@ -32,101 +48,181 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         }
     }
 
+
+    //참고 코드 Note 클래스 업데이트 아래와 같이 노트를 생성하고 파괴한다. 이때 파괴는 플레이어가 직접 파괴하는게 아닌 노트를 놓쳐서 파괴된 노트다.
+    //void Update()
+    //{
+    //    double timeSinceInstantiated = SongManager.GetAudioSourceTime() - timeInstantiated; //생성타임과 관련된 것 같다.
+    //    float t = (float)(timeSinceInstantiated / (SongManager.Instance.noteTime * 2));  // 지역변수(실수) t 선언   
+    //    if (t > 1)
+    //    {
+    //        Destroy(gameObject);
+    //    }
+    //    else
+    //    {
+    //        transform.localPosition = Vector3.Lerp(Vector3.up * SongManager.Instance.noteSpawnY, Vector3.up * SongManager.Instance.noteDespawnY, t);
+    //        GetComponent<SpriteRenderer>().enabled = true;
+    //    }
+    //}
+
+
+
     #region private
     // 노트를 생성하고 이동시키는 함수
-    private void CreateMoveNoteToHit(int noteIndex)
+    private void CreateMoveNoteToHit(int _noteIndex)
     {
-        Image noteGo = Instantiate(Noteboxes[noteIndex], Hitboxes[noteIndex].transform);
-        NoteQueues[noteIndex].Enqueue(noteGo);
-        StartCoroutine(CreateMoveNoteToHitCoroutine(noteGo, noteIndex));
+        Image noteGo = Instantiate(Noteboxes[_noteIndex], Hitboxes[_noteIndex].transform);
+        NoteQueues[_noteIndex].Enqueue(noteGo);
+        StartCoroutine(CreateMoveNoteToHitCoroutine(noteGo, _noteIndex));
     }
-
     // 노트를 히트박스까지 이동시키는 코루틴
-    private IEnumerator CreateMoveNoteToHitCoroutine(Image _Notebox, int noteIndex)
+    private IEnumerator CreateMoveNoteToHitCoroutine(Image _Notebox, int _noteIndex)
     {
         _Notebox.gameObject.SetActive(true);
-        Stoptimings[noteIndex] = 0f;
+        Stoptimings[_noteIndex] = 0f;
         float time = 0f;
         while (time < 1f && _Notebox != null)
         {
             if (_Notebox != null)
             {
-                _Notebox.rectTransform.anchoredPosition = Vector3.Lerp(Noteboxes[noteIndex].rectTransform.anchoredPosition, Hitboxes[noteIndex].rectTransform.anchoredPosition, time * 10 / 8f);
-                _Notebox.rectTransform.sizeDelta = Vector3.Lerp(Noteboxes[noteIndex].rectTransform.sizeDelta, Vector2.zero, 5 * time - 4);
+                _Notebox.rectTransform.anchoredPosition = Vector3.Lerp(Noteboxes[_noteIndex].rectTransform.anchoredPosition, Hitboxes[_noteIndex].rectTransform.anchoredPosition, time * 10 / 8f);
+                _Notebox.rectTransform.sizeDelta = Vector3.Lerp(Noteboxes[_noteIndex].rectTransform.sizeDelta, Vector2.zero, 5 * time - 4);
             }
             if (time > 1f)
             {
                 time = 1f;
             }
-            Stoptimings[noteIndex] = time;
-            time += Time.deltaTime;
+            Stoptimings[_noteIndex] = time;
+            time += Time.deltaTime * Bpm * 0.01f;
             yield return null;
         }
         if (_Notebox != null)
         {
-            Stoptimings[noteIndex] = 0.5f;
-            _Notebox.rectTransform.anchoredPosition = NoteBoxEndPoints[noteIndex];
-            HitNote(noteIndex);
+            Stoptimings[_noteIndex] = 0.4f;
+            _Notebox.rectTransform.anchoredPosition = NoteBoxEndPoints[_noteIndex];
+            HitNote(_noteIndex);
         }
-        Stoptimings[noteIndex] = 0f;
+        Stoptimings[_noteIndex] = 0f;
     }
 
     #endregion
 
     #region public
-    // 노트 판정 함수 (퍼펙, 굿 경우 콤보카운트++, 배드는 0으로 초기화)
-    public void HitNote(int noteIndex)
+    // 노트 판정 함수 (퍼펙 점수 +50, 굿 +10 - 둘다 콤보카운트++, 배드는 점수 +0 - 콤보 0으로 초기화)
+    public void HitNote(int _noteIndex)
     {
-        if (Stoptimings[noteIndex] >= 0.4f)
+        if (Stoptimings[_noteIndex] >= 0.4f)
         {
-            if (NoteQueues[noteIndex].Count > 0 && NoteQueues[noteIndex] != null)
+            if (NoteQueues[_noteIndex].Count > 0 && NoteQueues[_noteIndex] != null)
             {
                 Image go = null;
-                if (NoteQueues[noteIndex].TryDequeue(out go))
+                if (NoteQueues[_noteIndex].TryDequeue(out go))
                     Destroy(go.gameObject);
             }
 
-            if (NoteQueues[noteIndex].Count >= 0)
+            if (NoteQueues[_noteIndex].Count >= 0)
             {
-                if (0.4 <= Stoptimings[noteIndex] && Stoptimings[noteIndex] < 0.6)
+                if (0.4 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 0.6)
                 {
-                    Debug.Log(Stoptimings[noteIndex] + " Bad");
+                    Debug.Log(Stoptimings[_noteIndex] + " Bad");
                     ComboCnt = 0;
                 }
 
-                else if (0.6 <= Stoptimings[noteIndex] && Stoptimings[noteIndex] < 0.75)
+                else if (0.6 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 0.75)
                 {
                     ComboCnt++;
-                    Debug.Log(Stoptimings[noteIndex] + " Good Combo: " + ComboCnt);
+                    Score += 10;
+                    Debug.Log(Stoptimings[_noteIndex] + " Good Combo: " + ComboCnt + "Score : " + Score);
                 }
-                else if (0.75 <= Stoptimings[noteIndex] && Stoptimings[noteIndex] < 0.85)
+                else if (0.75 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 0.85)
                 {
                     ComboCnt++;
-                    Debug.Log(Stoptimings[noteIndex] + " Perfect Combo: " + ComboCnt);
+                    Score += 50;
+                    Debug.Log(Stoptimings[_noteIndex] + " Perfect Combo: " + ComboCnt + "Score : " + Score);
                 }
-                else if (0.85 <= Stoptimings[noteIndex] && Stoptimings[noteIndex] < 1)
+                else if (0.85 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 1)
                 {  
                     ComboCnt++;
-                    Debug.Log(Stoptimings[noteIndex] + " Good! Combo: " + ComboCnt);
+                    Score += 10;
+                    Debug.Log(Stoptimings[_noteIndex] + " Good! Combo: " + ComboCnt + "Score : " + Score);
                 }
             }
         }
     }
 
     // 노트를 생성하는 함수 (Q, W, E, R에 맞게)
-    public void PushNote(int noteIndex)
+    public void PushNote(int _noteIndex)
     {
-        CreateMoveNoteToHit(noteIndex);
+        CreateMoveNoteToHit(_noteIndex);
     }
 
-    //Bpm을 넣으면 델타타임 대신 쓸 수 있는 BpmDelta를 반환함과 동시에 Bpm 변수를 BpmDelta로 만듬
-    public float SetBpmDelta(float _bpm)
+    public void PushNotes(int[] _QWER) // QWER[] 형식으로 노트를 동시에 보냄
     {
-        float beatsPerSecond = _bpm / 60f;  // BPM을 초당 비트 수로 변환
-        float BpmDelta = Time.deltaTime * beatsPerSecond;  // Time.deltaTime을 BPM에 맞게 변환
-        Bpm = BpmDelta;
-        return BpmDelta;
+        if (_QWER[0] == 1)
+            PushNote(0);
+
+        if (_QWER[1] == 1)
+            PushNote(1);
+
+        if (_QWER[2] == 1)
+            PushNote(2);
+
+        if (_QWER[3] == 1)
+            PushNote(3);
     }
+    public void WhenPushNotes(int[] _QWER, float[] _barNBeat)
+    {
+        StartCoroutine(WhenPushNotesCo(_QWER,_barNBeat));
+    }
+    public IEnumerator WhenPushNotesCo(int[] _QWER, float[] _barNBeat) // 동시에(또는 단일로) 푸쉬할 버튼을 고르고 몇마디 몇박자에 보낼지 정하는 함수
+    {
+        float bar = 0f;
+        float beat = 0f;
+        while (true)
+        {
+            Debug.Log(bar + " "+ beat);
+            beat += Time.deltaTime * Bpm * 0.01f;
+            if (beat > 4)
+            {
+                beat %= 4;
+                bar++;
+            }
+
+            if (bar >= _barNBeat[0] && beat >= _barNBeat[1])
+            {
+                PushNotes(_QWER);
+                Debug.Log("진짜옴");
+                yield break;
+            }
+            yield return null;
+        }
+    }
+
+
+
+    //점수 0으로 초기화
+    public void Score0()
+    {
+        Score = 0;
+    }
+
+
+
+    //public void SetTimeStamps(Melanchall.DryWetMidi.Interaction.Note[] array)
+    //{
+    //    foreach (var note in array)
+    //    {
+    //        if (note.NoteName == noteRestriction)
+    //        {
+    //            var metricTimeSpan = TimeConverter.ConvertTo<MetricTimeSpan>(note.Time, SongManager.midiFile.GetTempoMap());
+    //            timeStamps.Add((double)metricTimeSpan.Minutes * 60f + metricTimeSpan.Seconds + (double)metricTimeSpan.Milliseconds / 1000f);
+    //        }
+    //    }
+    //}
+    //public static double GetAudioSourceTime()
+    //{
+    //    return (double)Instance.audioSource.timeSamples / Instance.audioSource.clip.frequency;
+    //}
 
     #endregion
 }
