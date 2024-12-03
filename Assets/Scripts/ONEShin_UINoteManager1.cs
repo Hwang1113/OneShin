@@ -12,6 +12,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     private List<Vector2> NoteBoxEndPoints = new List<Vector2>(); // 각 노트 타입의 끝 위치를 리스트로 관리
     private List<Queue<Image>> NoteQueues = new List<Queue<Image>>(); // 각 노트 타입의 큐를 리스트로 관리
     private float Bpm = 0f; //60bpm 1분에 60번, 1초 1번
+    
     private void Awake()
     {
         // Q, W, E, R에 대한 Hitbox와 Notebox 초기화
@@ -68,32 +69,13 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         }
         Stoptimings[noteIndex] = 0f;
     }
+
     #endregion
 
     #region public
     // 노트 판정 함수
     public void HitNote(int noteIndex)
     {
-        // noteIndex가 유효한 범위 내에 있는지 확인
-        if (noteIndex < 0 || noteIndex >= 4)
-        {
-            Debug.LogError("Invalid noteIndex: " + noteIndex);
-            return; // 유효하지 않은 인덱스인 경우 함수 종료
-        }
-        #region 디버그
-        // 각 리스트의 크기 출력 (디버깅용)
-        //Debug.Log("Hitboxes Count: " + Hitboxes.Count);
-        //Debug.Log("Noteboxes Count: " + Noteboxes.Count);
-        //Debug.Log("Stoptimings Count: " + Stoptimings[noteIndex]);
-        //Debug.Log("NoteboxStartPoints Count: " + NoteboxStartPoints.Count);
-        //Debug.Log("NoteBoxEndPoints Count: " + NoteBoxEndPoints.Count);
-        //Debug.Log("NoteQueues Count: " + NoteQueues.Count);
-
-        // 해당 인덱스의 요소들이 null이 아닌지 체크 (디버깅용)
-        //if (Hitboxes[noteIndex] == null) Debug.LogError("Hitbox is null at index " + noteIndex);
-        //if (Noteboxes[noteIndex] == null) Debug.LogError("Notebox is null at index " + noteIndex);
-        //if (Stoptimings[noteIndex] == null) Debug.LogError("Stoptiming is null at index " + noteIndex);
-        #endregion 
         if (Stoptimings[noteIndex] >= 0.4f)
         {
             if (NoteQueues[noteIndex].Count > 0 && NoteQueues[noteIndex] != null)
@@ -120,13 +102,6 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     // 노트를 생성하는 함수 (Q, W, E, R에 맞게)
     public void PushNote(int noteIndex)
     {
-        // noteIndex가 유효한 범위 내에 있는지 확인
-        if (noteIndex < 0 || noteIndex >= 4)
-        {
-            Debug.LogError("Invalid noteIndex in PushNote: " + noteIndex);
-            return;
-        }
-
         CreateMoveNoteToHit(noteIndex);
     }
 
