@@ -1,4 +1,3 @@
-using Melanchall.DryWetMidi.Interaction;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,10 +24,6 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
 
 
     #endregion
-    //public FourByFour SongManager = null;
-    //public Melanchall.DryWetMidi.MusicTheory.NoteName noteRestriction;
-    //public List<double> timeStamps = new List<double>();
-    //public static FourByFour Instance;
     private void Awake()
     {
       
@@ -47,25 +42,6 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
             NoteBoxEndPoints.Add(Hitboxes[i].rectTransform.anchoredPosition + new Vector2(-Hitboxes[i].rectTransform.sizeDelta.x, Hitboxes[i].rectTransform.sizeDelta.y));
         }
     }
-
-
-    //참고 코드 Note 클래스 업데이트 아래와 같이 노트를 생성하고 파괴한다. 이때 파괴는 플레이어가 직접 파괴하는게 아닌 노트를 놓쳐서 파괴된 노트다.
-    //void Update()
-    //{
-    //    double timeSinceInstantiated = SongManager.GetAudioSourceTime() - timeInstantiated; //생성타임과 관련된 것 같다.
-    //    float t = (float)(timeSinceInstantiated / (SongManager.Instance.noteTime * 2));  // 지역변수(실수) t 선언   
-    //    if (t > 1)
-    //    {
-    //        Destroy(gameObject);
-    //    }
-    //    else
-    //    {
-    //        transform.localPosition = Vector3.Lerp(Vector3.up * SongManager.Instance.noteSpawnY, Vector3.up * SongManager.Instance.noteDespawnY, t);
-    //        GetComponent<SpriteRenderer>().enabled = true;
-    //    }
-    //}
-
-
 
     #region private
     // 노트를 생성하고 이동시키는 함수
@@ -205,24 +181,5 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     {
         Score = 0;
     }
-
-
-
-    //public void SetTimeStamps(Melanchall.DryWetMidi.Interaction.Note[] array)
-    //{
-    //    foreach (var note in array)
-    //    {
-    //        if (note.NoteName == noteRestriction)
-    //        {
-    //            var metricTimeSpan = TimeConverter.ConvertTo<MetricTimeSpan>(note.Time, SongManager.midiFile.GetTempoMap());
-    //            timeStamps.Add((double)metricTimeSpan.Minutes * 60f + metricTimeSpan.Seconds + (double)metricTimeSpan.Milliseconds / 1000f);
-    //        }
-    //    }
-    //}
-    //public static double GetAudioSourceTime()
-    //{
-    //    return (double)Instance.audioSource.timeSamples / Instance.audioSource.clip.frequency;
-    //}
-
     #endregion
 }
