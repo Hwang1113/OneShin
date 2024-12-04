@@ -19,11 +19,10 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     public int ComboCnt = 0; //콤보 카운트
     public int Score = 0; // 점수 
     public float Bpm = 60; // 음악 템포 또는 BPM 형식
-    public float[] barNBeat = { 0, 0 }; // 몇마디 몇박에 나올지 형식 {bar,beat}
-    public float maxBeat = 4f;  //4분의 4박자면 4를 입력 , 4분의 3박자면 3을 입력
-    public float maxBar = 4f; // 최대마디
-    public int[] QWER = { 0, 0, 0, 0 }; // 어떤 노트가 동시에 나올지 형식
-    private Queue<int> processedIndices = new Queue<int>();
+    //public float[] barNBeat = { 0, 0 }; // 몇마디 몇박에 나올지 형식 {bar,beat}
+    //public float maxBeat = 4f;  //4분의 4박자면 4를 입력 , 4분의 3박자면 3을 입력
+    //public float maxBar = 4f; // 최대마디
+    //public int[] QWER = { 0, 0, 0, 0 }; // 어떤 노트가 동시에 나올지 형식
 
     #endregion
     private void Awake()
@@ -145,6 +144,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     {
         CreateMoveNoteToHit(_noteIndex);
     }
+
     //public void PushNotes(int[] _QWER) // QWER[] 형식으로 노트를 동시에 보냄
     //{
     //    if (_QWER[0] == 1)
@@ -236,7 +236,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         _bar = (_bar * 4) - 4;
         while (true)
         {
-            time += Time.deltaTime * Bpm * 0.005f;
+            time += Time.deltaTime * Bpm * 0.01f;
             if (time > 1)
             {
                 time %= 1;
@@ -253,6 +253,41 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
             yield return null;
         }
 
+    }
+
+    public void PushLongNote(int _noteIndex)
+    {
+        Image noteGo = Instantiate(Noteboxes[_noteIndex], Hitboxes[_noteIndex].transform);
+        NoteQueues[_noteIndex].Enqueue(noteGo);
+        StartCoroutine(CreateLongNoteCo(noteGo, _noteIndex));
+    }
+    public IEnumerator CreateLongNoteCo(Image _Notebox, int _noteIndex)
+    {
+        _Notebox.gameObject.SetActive(true);
+        Stoptimings[_noteIndex] = 0f;
+        float time = 0f;
+        while (time < 1f && _Notebox != null)
+        {
+            if (_Notebox != null)
+            {
+                _Notebox.rectTransform.anchoredPosition = Vector3.Lerp(Noteboxes[_noteIndex].rectTransform.anchoredPosition, Hitboxes[_noteIndex].rectTransform.anchoredPosition, time * 10 / 8f);
+                _Notebox.rectTransform.sizeDelta = Vector3.Lerp(Noteboxes[_noteIndex].rectTransform.sizeDelta, Vector2.zero, 5 * time - 4);
+            }
+            if (time > 1f)
+            {
+                time = 1f;
+            }
+            Stoptimings[_noteIndex] = time;
+            time += Time.deltaTime * Bpm * 0.005f;
+            yield return null;
+        }
+        if (_Notebox != null)
+        {
+            Stoptimings[_noteIndex] = 0.4f;
+            _Notebox.rectTransform.anchoredPosition = NoteBoxEndPoints[_noteIndex];
+            HitNote(_noteIndex);
+        }
+        Stoptimings[_noteIndex] = 0f;
     }
 
 
