@@ -20,6 +20,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     public float Bpm = 60; // 음악 템포 또는 BPM 형식
     public float[] barNBeat = { 0, 0 }; // 몇마디 몇박에 나올지 형식 {bar,beat}
     public float maxBeat = 4f;  //4분의 4박자면 4를 입력 , 4분의 3박자면 3을 입력
+    public float maxBar = 4f; // 최대마디
     public int[] QWER = { 0, 0, 0, 0 }; // 어떤 노트가 동시에 나올지 형식
 
 
@@ -69,7 +70,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
                 time = 1f;
             }
             Stoptimings[_noteIndex] = time;
-            time += Time.deltaTime * Bpm * 0.01f;
+            time += Time.deltaTime * Bpm * 0.005f;
             yield return null;
         }
         if (_Notebox != null)
@@ -170,17 +171,17 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         {
             //Debug.Log(bar + " "+ beat);
             beat += Time.deltaTime * Bpm * 0.01f;
-            if (beat > 4)
+            if (beat > maxBeat)
             {
                 beat %= 4;
                 bar++;
-                Debug.Log(bar + " " + beat);
+                //Debug.Log(bar + " " + beat);
             }
 
             if (bar >= _barNBeat[0] && beat >= _barNBeat[1])
             {
                 PushNotes(_QWER);
-                Debug.Log("노트 옴");
+                //Debug.Log("노트 옴");
                 yield break;
             }
             yield return null;
