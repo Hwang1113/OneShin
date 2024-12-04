@@ -255,40 +255,40 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
 
     }
 
-    public void PushLongNote(int _noteIndex)
-    {
-        Image noteGo = Instantiate(Noteboxes[_noteIndex], Hitboxes[_noteIndex].transform);
-        NoteQueues[_noteIndex].Enqueue(noteGo);
-        StartCoroutine(CreateLongNoteCo(noteGo, _noteIndex));
-    }
-    public IEnumerator CreateLongNoteCo(Image _Notebox, int _noteIndex)
-    {
-        _Notebox.gameObject.SetActive(true);
-        Stoptimings[_noteIndex] = 0f;
-        float time = 0f;
-        while (time < 1f && _Notebox != null)
-        {
-            if (_Notebox != null)
-            {
-                _Notebox.rectTransform.anchoredPosition = Vector3.Lerp(Noteboxes[_noteIndex].rectTransform.anchoredPosition, Hitboxes[_noteIndex].rectTransform.anchoredPosition, time * 10 / 8f);
-                _Notebox.rectTransform.sizeDelta = Vector3.Lerp(Noteboxes[_noteIndex].rectTransform.sizeDelta, Vector2.zero, 5 * time - 4);
-            }
-            if (time > 1f)
-            {
-                time = 1f;
-            }
-            Stoptimings[_noteIndex] = time;
-            time += Time.deltaTime * Bpm * 0.005f;
-            yield return null;
-        }
-        if (_Notebox != null)
-        {
-            Stoptimings[_noteIndex] = 0.4f;
-            _Notebox.rectTransform.anchoredPosition = NoteBoxEndPoints[_noteIndex];
-            HitNote(_noteIndex);
-        }
-        Stoptimings[_noteIndex] = 0f;
-    }
+    //public void PushLongNote(int _noteIndex)
+    //{
+    //    Image noteGo = Instantiate(Noteboxes[_noteIndex], Hitboxes[_noteIndex].transform);
+    //    NoteQueues[_noteIndex].Enqueue(noteGo);
+    //    StartCoroutine(CreateLongNoteCo(noteGo, _noteIndex));
+    //}
+    //public IEnumerator CreateLongNoteCo(Image _Notebox, int _noteIndex)
+    //{
+    //    _Notebox.gameObject.SetActive(true);
+    //    Stoptimings[_noteIndex] = 0f;
+    //    float time = 0f;
+    //    while (time < 1f && _Notebox != null)
+    //    {
+    //        if (_Notebox != null)
+    //        {
+    //            _Notebox.rectTransform.anchoredPosition = Vector3.Lerp(Noteboxes[_noteIndex].rectTransform.anchoredPosition, Hitboxes[_noteIndex].rectTransform.anchoredPosition, time * 10 / 8f);
+    //            _Notebox.rectTransform.sizeDelta = Vector3.Lerp(Noteboxes[_noteIndex].rectTransform.sizeDelta, Vector2.zero, 5 * time - 4);
+    //        }
+    //        if (time > 1f)
+    //        {
+    //            time = 1f;
+    //        }
+    //        Stoptimings[_noteIndex] = time;
+    //        time += Time.deltaTime * Bpm * 0.005f;
+    //        yield return null;
+    //    }
+    //    if (_Notebox != null)
+    //    {
+    //        Stoptimings[_noteIndex] = 0.4f;
+    //        _Notebox.rectTransform.anchoredPosition = NoteBoxEndPoints[_noteIndex];
+    //        HitNote(_noteIndex);
+    //    }
+    //    Stoptimings[_noteIndex] = 0f;
+    //}
 
 
     //점수 0으로 초기화
@@ -348,14 +348,14 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         {
             0,0,0,1,
             0,0,1,1,
-            1,0,0,0,
+            0,0,0,0,
             1,1,0,0
         };        
         int[] pattern2box =
         {
             1,0,0,1,
             0,1,1,0,
-            1,0,0,1,
+            0,0,0,0,
             1,0,0,1
         };    
         int[] pattern3box =
@@ -371,6 +371,13 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
             0,0,0,0,
             1,1,1,1,
             1,0,0,1
+        };        
+        int[] pattern5box =
+        {
+            1,0,0,1,
+            0,0,0,0,
+            1,0,1,0,
+            0,0,0,0
         };
         NotebyBarintlist(onebar, onebox);
         NotebyBarintlist(twobar, twobox);
@@ -380,6 +387,15 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         NotebyBarintlist(6, pattern2box);
         NotebyBarintlist(7, pattern3box);
         NotebyBarintlist(8, pattern4box);
+        NotebyBarintlist(9, pattern5box);
+        NotebyBarintlist(10, pattern5box);
+        NotebyBarintlist(11, pattern5box);
+        NotebyBarintlist(12, pattern5box);
+        NotebyBarintlist(13, pattern5box);
+        NotebyBarintlist(14, pattern2box);
+        NotebyBarintlist(15, pattern4box);
+        NotebyBarintlist(16, pattern2box);
+        NotebyBarintlist(17, pattern3box);
 
         Debug.Log("sampleNotesComming");
         return true;

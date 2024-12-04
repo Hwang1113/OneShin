@@ -18,7 +18,7 @@ public class FourByFour : MonoBehaviour
     private void Start()
     {
         UINMg.Score0();
-        UINMg.SetBpm(240); //120 BPM 설정
+        UINMg.SetBpm(240); //240 BPM 으로설정
         UINMg.sampleNotesComming();
         audioSource.clip = bgm;
         audioSource.Play();
@@ -46,14 +46,14 @@ public class FourByFour : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F))
             UINMg.HitNote(0);
 
-        // 디버그용 롱노트 푸시
-        if (Input.GetKeyDown(KeyCode.U))
-            UINMg.PushLongNote(2);
-        if (Input.GetKeyDown(KeyCode.I))
-            UINMg.PushLongNote(3);
-        if (Input.GetKeyDown(KeyCode.O))
-            UINMg.PushLongNote(1);
-        if (Input.GetKeyDown(KeyCode.P))
-            UINMg.PushLongNote(0);
+        //// 디버그용 롱노트 푸시
+        //if (Input.GetKeyDown(KeyCode.U))
+        //    UINMg.PushLongNote(2);
+        //if (Input.GetKeyDown(KeyCode.I))
+        //    UINMg.PushLongNote(3);
+        //if (Input.GetKeyDown(KeyCode.O))
+        //    UINMg.PushLongNote(1);
+        //if (Input.GetKeyDown(KeyCode.P))
+        //    UINMg.PushLongNote(0);
     }
 }
