@@ -7,12 +7,12 @@ public class FourByFour : MonoBehaviour
     [SerializeField]
     private ONEShin_UINoteManager1 UINMg = null;
     [SerializeField]
-    private AudioClip bgm = null;
-    private AudioSource audioSource = null;
+    //private AudioClip bgm = null;
+    //private AudioSource audioSource = null;
 
     private void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
+        //audioSource = GetComponent<AudioSource>();
         UINMg = GetComponentInChildren<ONEShin_UINoteManager1>();
     }
     private void Start()
@@ -20,8 +20,8 @@ public class FourByFour : MonoBehaviour
         UINMg.Score0();
         UINMg.SetBpm(240); //240 BPM 으로설정
         UINMg.sampleNotesComming();
-        audioSource.clip = bgm;
-        audioSource.Play();
+        //audioSource.clip = bgm;
+        //audioSource.Play();
     }
 
     private void Update()
