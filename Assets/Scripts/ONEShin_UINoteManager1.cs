@@ -255,14 +255,22 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         float feverTimeCnt = 0;
         isFever = true;
         while (feverTimeCnt < 3)
+        {
             feverTimeCnt += Time.deltaTime;
-        isFever = false;
-        yield return null;
+            Debug.Log("피버타임!");
+            yield return null;
+        }
+        if (feverTimeCnt >= 3)
+        {
+            Debug.Log("피버타임끝~");
+            isFever = false;
+        }
     }
 
     public void feverTimeHit() // 피버타임히트 함수 실행하면 1점 추가
     {
             Score += 1;
+        Debug.Log(Score);
     }
     #endregion
 
