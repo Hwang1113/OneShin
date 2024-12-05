@@ -88,9 +88,11 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     // 노트 판정 제거 함수 (퍼펙 점수 +50, 굿 +10 - 둘다 ComboCnt++;, 배드는 콤보 0으로 초기화 lifeCnt--;)
     public void HitNote(int _noteIndex)
     {
+        Debug.Log(Score);
         if (isFever)
         { 
             feverTimeHit();
+
         }
 
         StartCoroutine(HitNoteCo(_noteIndex));
@@ -364,7 +366,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         }
         if (feverTimeCnt >= 3)
         {
-            //Debug.Log("피버타임끝~");
+            Debug.Log("피버타임끝~");
             isFever = false;
         }
     }
@@ -372,7 +374,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     public void feverTimeHit() // 피버타임히트 함수 실행하면 1점 추가
     {
             Score += 1;
-        //Debug.Log(Score);
+        Debug.Log(Score);
     }
     #endregion
     #region 퍼블릭 변수 확인
