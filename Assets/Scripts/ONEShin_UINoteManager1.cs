@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,33 +6,31 @@ using UnityEngine.UI;
 
 public class ONEShin_UINoteManager1 : MonoBehaviour
 {
-    //버튼 델리게이트 선언 
-    public delegate void BtnDelegate();
-    public BtnDelegate onClickBtn = null;
-
     #region private 변수
     private List<Image> Hitboxes = new List<Image>(); // Q, W, E, R에 대한 히트박스를 리스트로 관리
     private List<Image> Noteboxes = new List<Image>(); // Q, W, E, R에 대한 노트박스를 리스트로 관리
-    private float[] Stoptimings = new float[4]; // 스탑 타이밍 배열
+    public List<Image> Accuracy = new List<Image>(); // Accuracy를 리스트로 관리 (Perfect,Good,Bad)
     private List<Vector2> NoteboxStartPoints = new List<Vector2>(); // 각 노트 타입의 시작 위치를 리스트로 관리
     private List<Vector2> NoteBoxEndPoints = new List<Vector2>(); // 각 노트 타입의 끝 위치를 리스트로 관리
     private List<Queue<Image>> NoteQueues = new List<Queue<Image>>(); // 각 노트 타입의 큐를 리스트로 관리
-    [SerializeField]
-    private Image Good = null; // Good
+    private float[] Stoptimings = new float[4]; // 스탑 타이밍 배열
     #endregion
     #region public 변수
     public int ComboCnt = 0; //콤보 카운트
     public int Score = 0; // 점수 
-    public float Bpm = 60; // 음악 템포 또는 BPM 형식
-    public int lifeCnt = 5; 
+    public int lifeCnt = 5;
+    public bool isLifeZero = false; // 라이프 0이 됐을때 true
     public int totalNoteCnt = 0;
+    public float Bpm = 60; // 음악 템포 또는 BPM 형식
     public bool isFever = false;
-    public const int EnterFeverCnt = 100;
+    public const int EnterFeverCnt = 100; 
+
+    // 라이프 매니저를 여기서 선언해서 라이프가 깎였을때 라이프 매니저 스크립트에 접근할 수 있게 선언이 필요함 12.05
+
     #endregion
+    #region private
     private void Awake()
     {
-      
-
         // Q, W, E, R에 대한 Hitbox와 Notebox 초기화
         for (int i = 0; i < 4; i++)
         {
@@ -41,17 +38,22 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
             Noteboxes.Add(Hitboxes[i].GetComponentsInChildren<Image>()[1]);
             NoteQueues.Add(new Queue<Image>());
         }
-
         // 각 노트의 시작 위치와 끝 위치 설정
         for (int i = 0; i < 4; i++)
         {
             NoteboxStartPoints.Add(Noteboxes[i].rectTransform.anchoredPosition);
             NoteBoxEndPoints.Add(Hitboxes[i].rectTransform.anchoredPosition + new Vector2(-Hitboxes[i].rectTransform.sizeDelta.x, Hitboxes[i].rectTransform.sizeDelta.y));
         }
+
+        Accuracy.AddRange(transform.GetChild(4).GetComponentsInChildren<Image>(false));
+
+        foreach (Image img in Accuracy)
+        {
+            img.gameObject.SetActive(false);  // 해당 GameObject 비활성화
+        }
+        // 라이프 매니저를 여기서 선언해서 라이프가 깎였을때 라이프 매니저 스크립트에 접근할 수 있게 [SerializeField]를 안했으면 여기서 어떻게든 가져와야함 12.05
+
     }
-
-
-    #region private
     private IEnumerator CreateMoveNoteToHitCoroutine(Image _Notebox, int _noteIndex)
     {
         _Notebox.gameObject.SetActive(true);
@@ -80,11 +82,8 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
             HitNote(_noteIndex);
         }
     }
-
     #endregion
-
     #region public
-
     #region 노트 판정 후 제거
     // 노트 판정 제거 함수 (퍼펙 점수 +50, 굿 +10 - 둘다 ComboCnt++;, 배드는 콤보 0으로 초기화 lifeCnt--;)
     public void HitNote(int _noteIndex)
@@ -121,6 +120,10 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
                 {
                     ComboCnt = 0;
                     lifeCnt--;
+                    //이곳에 바나나 나 번개 호출하면 됌 12.05할일 
+                    if (lifeCnt == 0)
+                        isLifeZero = true;
+                    StartCoroutine(ShowAccuracyUI(2));
                 }
 
                 else if (0.6 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 0.75) //good
@@ -129,6 +132,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
                     Score += 10;
                     if (ComboCnt != 0 && 0 == ComboCnt % EnterFeverCnt)
                         StartCoroutine(StartFeverTime());
+                    StartCoroutine(ShowAccuracyUI(1));
 
                 }
                 else if (0.75 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 0.85) //perfect
@@ -137,6 +141,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
                     Score += 50;
                     if (ComboCnt != 0 && 0 == ComboCnt % EnterFeverCnt)
                         StartCoroutine(StartFeverTime());
+                    StartCoroutine(ShowAccuracyUI(0));
                 }
                 else if (0.85 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 1)//good
                 {
@@ -144,11 +149,26 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
                     Score += 10;
                     if (ComboCnt != 0 && 0 == ComboCnt % EnterFeverCnt)
                         StartCoroutine(StartFeverTime());
+                    StartCoroutine(ShowAccuracyUI(1));
                 }
             }
 
         }
         yield return null;
+    }
+    //3초동안 정확도를 알려 해준다 0퍼펙,1굳,2배드
+    public IEnumerator ShowAccuracyUI(int _Accuracy) 
+    {
+        float time = 0f;
+        foreach (Image img in Accuracy)
+            img.gameObject.SetActive(false);
+        Accuracy[_Accuracy].gameObject.SetActive(true);
+        while (time < 2)
+        {
+            time += Time.deltaTime;
+            yield return null;
+        }
+        Accuracy[_Accuracy].gameObject.SetActive(false);
     }
     #endregion
     #region 노트생성
@@ -182,7 +202,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     //  };
     public IEnumerator NoteBil(int _bar, int[] _boxlist)
     {
-        Debug.Log(_bar +"Start" + _boxlist);
+        //Debug.Log(_bar +"Start" + _boxlist);
         float time = 0;
         bool push1 = false;
         bool push2 = false;
@@ -208,7 +228,89 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
             yield return null;
         }
 
-    } // 노트 여러개 보내기
+    }
+
+    public bool sampleNotesComming()
+    {
+        int onebar = 1;
+        int twobar = 2;
+        int[] onebox =
+        {
+            1,0,0,0,
+            0,1,0,0,
+            0,0,1,0,
+            0,0,0,1
+        };
+        int[] twobox =
+        {
+            0,0,0,1,
+            0,0,1,0,
+            0,1,0,0,
+            1,0,0,0
+        };
+        int[] pattern1box =
+        {
+            0,0,0,1,
+            0,0,1,1,
+            0,0,0,0,
+            1,1,0,0
+        };
+        int[] pattern2box =
+        {
+            1,0,0,1,
+            0,1,1,0,
+            0,0,0,0,
+            1,0,0,1
+        };
+        int[] pattern3box =
+        {
+            1,0,0,1,
+            0,0,0,0,
+            0,1,1,0,
+            1,0,0,1
+        };
+        int[] pattern4box =
+        {
+            1,0,0,1,
+            0,0,0,0,
+            1,1,1,1,
+            1,0,0,1
+        };
+        int[] pattern5box =
+        {
+            1,0,0,1,
+            0,0,0,0,
+            1,0,1,0,
+            0,0,0,0
+        };
+        int[] pattern6box =
+        {
+            1,0,0,0,
+            1,0,0,0,
+            1,0,0,0,
+            1,0,0,0
+        };
+        NotebyBarintlist(onebar, pattern1box);
+        NotebyBarintlist(twobar, pattern2box);
+        NotebyBarintlist(3, pattern3box);
+        NotebyBarintlist(4, pattern4box);
+        NotebyBarintlist(5, pattern5box);
+        NotebyBarintlist(6, pattern6box);
+        NotebyBarintlist(7, pattern6box);
+        NotebyBarintlist(8, pattern6box);
+        NotebyBarintlist(9, pattern6box);
+        NotebyBarintlist(10, pattern5box);
+        NotebyBarintlist(11, pattern5box);
+        NotebyBarintlist(12, pattern5box);
+        NotebyBarintlist(13, pattern5box);
+        NotebyBarintlist(14, pattern2box);
+        NotebyBarintlist(15, pattern4box);
+        NotebyBarintlist(16, pattern2box);
+        NotebyBarintlist(17, pattern3box);
+
+        //Debug.Log("sampleNotesComming");
+        return true;
+    } //테스트 용 노트 여러개 보내기
     #endregion
     #region 퍼블릭 변수 제어
     public void Score0()
@@ -273,93 +375,15 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         //Debug.Log(Score);
     }
     #endregion
-
-    public bool sampleNotesComming()
-    {
-        int onebar = 1;
-        int twobar = 2;
-        int[] onebox =
-        {
-            1,0,0,0,
-            0,1,0,0,
-            0,0,1,0,
-            0,0,0,1
-        };        
-        int[] twobox =
-        {
-            0,0,0,1,
-            0,0,1,0,
-            0,1,0,0,
-            1,0,0,0
-        };
-        int[] pattern1box =
-        {
-            0,0,0,1,
-            0,0,1,1,
-            0,0,0,0,
-            1,1,0,0
-        };        
-        int[] pattern2box =
-        {
-            1,0,0,1,
-            0,1,1,0,
-            0,0,0,0,
-            1,0,0,1
-        };    
-        int[] pattern3box =
-        {
-            1,0,0,1,
-            0,0,0,0,
-            0,1,1,0,
-            1,0,0,1
-        };    
-        int[] pattern4box =
-        {
-            1,0,0,1,
-            0,0,0,0,
-            1,1,1,1,
-            1,0,0,1
-        };        
-        int[] pattern5box =
-        {
-            1,0,0,1,
-            0,0,0,0,
-            1,0,1,0,
-            0,0,0,0
-        };
-        int[] pattern6box =
-        {
-            1,0,0,0,
-            1,0,0,0,
-            1,0,0,0,
-            1,0,0,0
-        };
-        NotebyBarintlist(onebar, pattern6box);
-        NotebyBarintlist(twobar, pattern6box);
-        NotebyBarintlist(3, pattern6box);
-        NotebyBarintlist(4, pattern6box);
-        NotebyBarintlist(5, pattern6box);
-        NotebyBarintlist(6, pattern6box);
-        NotebyBarintlist(7, pattern6box);
-        NotebyBarintlist(8, pattern6box);
-        NotebyBarintlist(9, pattern6box);
-        NotebyBarintlist(10, pattern5box);
-        NotebyBarintlist(11, pattern5box);
-        NotebyBarintlist(12, pattern5box);
-        NotebyBarintlist(13, pattern5box);
-        NotebyBarintlist(14, pattern2box);
-        NotebyBarintlist(15, pattern4box);
-        NotebyBarintlist(16, pattern2box);
-        NotebyBarintlist(17, pattern3box);
-
-        Debug.Log("sampleNotesComming");
-        return true;
-    } //테스트 용 노트 여러개 보내기
-
     #region 퍼블릭 변수 확인
     public bool IsFeverTime
     {
         get { return isFever; }  // 값을 반환
+    }
+
+    public int ChecklifeCnt
+    {
+        get { return lifeCnt; }  // 값을 반환
     }
     #endregion
     #endregion
