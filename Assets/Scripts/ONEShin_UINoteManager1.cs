@@ -18,8 +18,8 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     private List<Vector2> NoteboxStartPoints = new List<Vector2>(); // 각 노트 타입의 시작 위치를 리스트로 관리
     private List<Vector2> NoteBoxEndPoints = new List<Vector2>(); // 각 노트 타입의 끝 위치를 리스트로 관리
     private List<Queue<Image>> NoteQueues = new List<Queue<Image>>(); // 각 노트 타입의 큐를 리스트로 관리
-    private List<Image> ComboUI = new List<Image>(); // 1000, 100, 10, 1에 대한 콤보UI를 리스트로 관리
-    private GameObject ComboUi = null; // 1000, 100, 10, 1에 대한 콤보UI를 리스트로 관리
+    [SerializeField]
+    private Image Good = null; // Good
     #endregion
     #region public 변수
     public int ComboCnt = 0; //콤보 카운트
@@ -28,10 +28,12 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     public int lifeCnt = 5; 
     public int totalNoteCnt = 0;
     public bool isFever = false;
+    public const int EnterFeverCnt = 100;
     #endregion
     private void Awake()
     {
       
+
         // Q, W, E, R에 대한 Hitbox와 Notebox 초기화
         for (int i = 0; i < 4; i++)
         {
@@ -45,10 +47,6 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         {
             NoteboxStartPoints.Add(Noteboxes[i].rectTransform.anchoredPosition);
             NoteBoxEndPoints.Add(Hitboxes[i].rectTransform.anchoredPosition + new Vector2(-Hitboxes[i].rectTransform.sizeDelta.x, Hitboxes[i].rectTransform.sizeDelta.y));
-        }
-        for (int i = 0; i < 4; i++)
-        {
-            ComboUI.Add(GetComponentsInChildren<Image>()[5]);
         }
     }
 
@@ -70,7 +68,8 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
             {
                 time = 1f;
             }
-            Stoptimings[_noteIndex] = time;
+            if (time > Stoptimings[_noteIndex])
+                Stoptimings[_noteIndex] = time;
             time += Time.deltaTime * Bpm * 0.005f;
             yield return null;
         }
@@ -87,9 +86,14 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     #region public
 
     #region 노트 판정 후 제거
-    // 노트 판정 제거 함수 (퍼펙 점수 +50, 굿 +10 - 둘다 콤보카운트++, 배드는 점수 +0 - 콤보 0으로 초기화)
+    // 노트 판정 제거 함수 (퍼펙 점수 +50, 굿 +10 - 둘다 ComboCnt++;, 배드는 콤보 0으로 초기화 lifeCnt--;)
     public void HitNote(int _noteIndex)
     {
+        if (isFever)
+        { 
+            feverTimeHit();
+        }
+
         StartCoroutine(HitNoteCo(_noteIndex));
     }
 
@@ -98,47 +102,48 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         // 다른 노트가 눌렸을 때 패널티 적용
         if (Stoptimings[_noteIndex] < 0.4f)
         {
-            // 다른 노트가 눌렸으므로, 콤보 초기화 와 점수 차감
-            ComboCnt = 0;
-            Score -= 10;
-            Debug.Log("다른 노트 누름");
-            Debug.Log(Stoptimings[_noteIndex]);
+            if (!isFever) // 피버타임이 아니면 패널티 콤보 카운트 0으로 초기화
+                ComboCnt = 0;   // 다른 노트가 눌렸으므로, 콤보 초기화
+            //피버 타임이면 패널티 미적용  
         }
 
         if (Stoptimings[_noteIndex] >= 0.4f)
         {
-            if (NoteQueues[_noteIndex].Count > 0 && NoteQueues[_noteIndex] != null)
+            if (NoteQueues[_noteIndex].Count > 0 && NoteQueues[_noteIndex] != null) //노트 파괴
             {
                 Image go = null;
                 if (NoteQueues[_noteIndex].TryDequeue(out go))
                     Destroy(go.gameObject);
             }
-            if (NoteQueues[_noteIndex].Count >= 0)
+            if (NoteQueues[_noteIndex].Count >= 0 && !isFever) // 판정 점수 계산, 피버타임이면 점수 계산 안함
             {
-                if (0.4 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 0.6)
+                if (0.4 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 0.6) //bad
                 {
-                    Debug.Log(Stoptimings[_noteIndex] + " Bad");
                     ComboCnt = 0;
                     lifeCnt--;
                 }
 
-                else if (0.6 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 0.75)
+                else if (0.6 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 0.75) //good
                 {
                     ComboCnt++;
                     Score += 10;
-                    Debug.Log(Stoptimings[_noteIndex] + " Good Combo: " + ComboCnt + "Score : " + Score);
+                    if (ComboCnt != 0 && 0 == ComboCnt % EnterFeverCnt)
+                        StartCoroutine(StartFeverTime());
+
                 }
-                else if (0.75 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 0.85)
+                else if (0.75 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 0.85) //perfect
                 {
                     ComboCnt++;
                     Score += 50;
-                    Debug.Log(Stoptimings[_noteIndex] + " Perfect Combo: " + ComboCnt + "Score : " + Score);
+                    if (ComboCnt != 0 && 0 == ComboCnt % EnterFeverCnt)
+                        StartCoroutine(StartFeverTime());
                 }
-                else if (0.85 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 1)
+                else if (0.85 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 1)//good
                 {
                     ComboCnt++;
                     Score += 10;
-                    Debug.Log(Stoptimings[_noteIndex] + " Good! Combo: " + ComboCnt + "Score : " + Score);
+                    if (ComboCnt != 0 && 0 == ComboCnt % EnterFeverCnt)
+                        StartCoroutine(StartFeverTime());
                 }
             }
 
@@ -154,7 +159,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         Image noteGo = Instantiate(Noteboxes[_noteIndex], Hitboxes[_noteIndex].transform);
         NoteQueues[_noteIndex].Enqueue(noteGo);
         StartCoroutine(CreateMoveNoteToHitCoroutine(noteGo, _noteIndex));
-    }
+    } // 노트(q2,w3,e0,r1) 중 하나 보내기
 
     public void NotebyBarintlist(int _bar, int[] _boxlist)
     {
@@ -203,48 +208,23 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
             yield return null;
         }
 
-    }
+    } // 노트 여러개 보내기
     #endregion
     #region 퍼블릭 변수 제어
     public void Score0()
     {
         Score = 0;
-    }
+    } // 스코어 0으로 초기화
     public void SetBpm(float _BPM)
     {
         Bpm = _BPM;
-    }
-    //public void sampleNotesComming()
-    //{
-    //    int[] sampleQWERAll = { 1, 1, 1, 1 };
-    //    int[] sampleQWER1 = { 1, 0, 0, 0 };
-    //    int[] sampleQWER2 = { 0, 1, 0, 0 };
-    //    int[] sampleQWER3 = { 0, 0, 1, 0 };
-    //    int[] sampleQWER4 = { 0, 0, 0, 1 };
-    //    float[] samplePBB = { 1f, 1f, 0f };
-    //    float[] samplePBB1 = { 0f, 0f, 0f };
-    //    float[] samplePBB6 = { 0f, 1f, 1f };
-    //    float[] samplePBB7 = { 0f, 1f, 2f };
-    //    float[] samplePBB8 = { 0f, 1f, 3f };
-    //    float[] samplePBB9 = { 0f, 2f, 0f };
-
-    //    WhenPushNotes(sampleQWERAll, samplePBB1);
-    //    WhenPushNotes(sampleQWER4, samplePBB6);
-    //    WhenPushNotes(sampleQWER3, samplePBB7);
-    //    WhenPushNotes(sampleQWER2, samplePBB8);
-    //    WhenPushNotes(sampleQWER1, samplePBB9);
-
-
-    //    // 현재 버그 : 코루틴으로 만든 노트 중 동일한 버튼으로 히트 할 수 있는 노트가 2개 이상 있으면 히트를 못하는 버그가 생김
-    //    // 
-    //    Debug.Log("sampleNotesComming");
-    //}
+    } // BPM 설정
     public void SetLife5()
     {
         lifeCnt = 5;
-    }
+    } // 라이프 카운트 5로 초기화
 
-    public string Rank()
+    public string Rank() // 보낸노트 종합 후 점수 비율에 따라 랭크 산정 
     {
         if(50 * totalNoteCnt == Score)
             return ("SSS Rank");        
@@ -263,8 +243,28 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
             return ("오류 랭크정산 안됌");
     }
 
-    #endregion
+    public void AddCombo99() // 콤보에 99 더하기
+    {
+        ComboCnt += 99;
+    }
 
+    #endregion
+    #region 피버타임
+    public IEnumerator StartFeverTime()
+    {
+        float feverTimeCnt = 0;
+        isFever = true;
+        while (feverTimeCnt < 3)
+            feverTimeCnt += Time.deltaTime;
+        isFever = false;
+        yield return null;
+    }
+
+    public void feverTimeHit() // 피버타임히트 함수 실행하면 1점 추가
+    {
+            Score += 1;
+    }
+    #endregion
 
     public bool sampleNotesComming()
     {
@@ -346,7 +346,13 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
 
         Debug.Log("sampleNotesComming");
         return true;
-    }
+    } //테스트 용 노트 여러개 보내기
 
+    #region 퍼블릭 변수 확인
+    public bool IsFeverTime
+    {
+        get { return isFever; }  // 값을 반환
+    }
+    #endregion
     #endregion
 }

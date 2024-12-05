@@ -43,5 +43,8 @@ public class FourByFour : MonoBehaviour
             UINMg.PushNote(1);
         if (Input.GetKeyDown(KeyCode.F))
             UINMg.PushNote(0);
+        // 디버그용 콤보 99로 만들기
+        if (Input.GetKeyDown(KeyCode.H))
+            UINMg.AddCombo99();
     }
 }
