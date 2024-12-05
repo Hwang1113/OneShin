@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.Networking;
-using System.Collections;
 
 public class FourByFour : MonoBehaviour
 {
@@ -18,7 +16,7 @@ public class FourByFour : MonoBehaviour
     private void Start()
     {
         UINMg.Score0();
-        UINMg.SetBpm(240); //240 BPM 으로설정
+        UINMg.SetBpm(120); //240 BPM 으로설정
         UINMg.sampleNotesComming();
         //audioSource.clip = bgm;
         //audioSource.Play();
@@ -38,22 +36,12 @@ public class FourByFour : MonoBehaviour
 
         // 디버그용 노트 푸시
         if (Input.GetKeyDown(KeyCode.A))
-            UINMg.HitNote(2);
+            UINMg.PushNote(2);
         if (Input.GetKeyDown(KeyCode.S))
-            UINMg.HitNote(3);
+            UINMg.PushNote(3);
         if (Input.GetKeyDown(KeyCode.D))
-            UINMg.HitNote(1);
+            UINMg.PushNote(1);
         if (Input.GetKeyDown(KeyCode.F))
-            UINMg.HitNote(0);
-
-        //// 디버그용 롱노트 푸시
-        //if (Input.GetKeyDown(KeyCode.U))
-        //    UINMg.PushLongNote(2);
-        //if (Input.GetKeyDown(KeyCode.I))
-        //    UINMg.PushLongNote(3);
-        //if (Input.GetKeyDown(KeyCode.O))
-        //    UINMg.PushLongNote(1);
-        //if (Input.GetKeyDown(KeyCode.P))
-        //    UINMg.PushLongNote(0);
+            UINMg.PushNote(0);
     }
 }
