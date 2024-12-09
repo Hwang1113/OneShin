@@ -211,7 +211,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     //   1,1,1,1,
     //   1,1,1,1
     //  };
-    public IEnumerator NoteBil(int _bar, int[] _boxlist)
+    public IEnumerator NoteBil(int _bar, int[] _boxlist) // 이런 방식은 최적화에 취약해 보임 마디가 80개면 코루틴을 동시에 80개 돌리는 셈이니
     {
         //Debug.Log(_bar +"Start" + _boxlist);
         float time = 0;
@@ -222,23 +222,26 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         float barinbil = (_bar * 4) - 4;
         while (true)
         {
-            Debug.Log(barinbil);
+            //Debug.Log(barinbil);
             time += Time.deltaTime * Bpm / 60f * 1f;
             if (time > 1)
             {
                 time %= 1;
                 barinbil--;
             }
-            if (barinbil == 0 && !push1)
-                { if (_boxlist[0] == 1) PushNote(2); if (_boxlist[1] == 1) PushNote(3); if (_boxlist[2] == 1) PushNote(1); if (_boxlist[3] == 1) PushNote(0); push1 = true; }            
-            if (barinbil == -1 && !push2)
-                { if (_boxlist[4] == 1) PushNote(2); if (_boxlist[5] == 1) PushNote(3); if (_boxlist[6] == 1) PushNote(1); if (_boxlist[7] == 1) PushNote(0); push2 = true; }          
-            if (barinbil == -2 && !push3)
-                { if (_boxlist[8] == 1) PushNote(2); if (_boxlist[9] == 1) PushNote(3); if (_boxlist[10] == 1) PushNote(1); if (_boxlist[11] == 1) PushNote(0); push3 = true; }          
-            if (barinbil == -3 && !push4)
+            if (barinbil < 1) // 임시 방편 최적화 검사는 덜 할 것이다.
+            {
+                if (barinbil == 0 && !push1)
+                { if (_boxlist[0] == 1) PushNote(2); if (_boxlist[1] == 1) PushNote(3); if (_boxlist[2] == 1) PushNote(1); if (_boxlist[3] == 1) PushNote(0); push1 = true; }
+                if (barinbil == -1 && !push2)
+                { if (_boxlist[4] == 1) PushNote(2); if (_boxlist[5] == 1) PushNote(3); if (_boxlist[6] == 1) PushNote(1); if (_boxlist[7] == 1) PushNote(0); push2 = true; }
+                if (barinbil == -2 && !push3)
+                { if (_boxlist[8] == 1) PushNote(2); if (_boxlist[9] == 1) PushNote(3); if (_boxlist[10] == 1) PushNote(1); if (_boxlist[11] == 1) PushNote(0); push3 = true; }
+                if (barinbil == -3 && !push4)
                 { if (_boxlist[12] == 1) PushNote(2); if (_boxlist[13] == 1) PushNote(3); if (_boxlist[14] == 1) PushNote(1); if (_boxlist[15] == 1) PushNote(0); push4 = true; }
-            if (barinbil == -4)
-                yield break;
+                if (barinbil == -4)
+                    yield break;
+            }
 
             yield return null;
         }

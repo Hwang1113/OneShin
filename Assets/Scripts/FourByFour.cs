@@ -49,14 +49,6 @@ public class FourByFour : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Z))
         {
-            int[] zerobox =
-            {
-            0,0,0,0,
-            0,0,0,0,
-            0,0,0,0,
-            0,0,0,0
-            };
-
             int[] pattern1box =
             {
             1,0,0,0,
@@ -137,7 +129,6 @@ public class FourByFour : MonoBehaviour
                 if (i == 8 && i == 24)//특정 마디 다른 패턴 사용 예제
                 {
                     UINMg.NotebyBarintlist(i + 1, pattern9box); // 특정 패턴
-
                 }
                 else
                 {
@@ -150,14 +141,13 @@ public class FourByFour : MonoBehaviour
                 UINMg.NotebyBarintlist(i + 6, pattern7box);   
                 UINMg.NotebyBarintlist(i + 7, pattern8box);   
             }
-            //마지막 5마디
+            //마지막 5마디 //마지막을 이렇게 안하고 위 반복문으로 돌리면 5마디만 도는 게 아니고 8마디 그대로 다 돌리니까 주의
             UINMg.NotebyBarintlist(80, pattern1box);
             UINMg.NotebyBarintlist(81, pattern2box);
             UINMg.NotebyBarintlist(82, pattern3box);
             UINMg.NotebyBarintlist(83, pattern7box);
             UINMg.NotebyBarintlist(84, pattern7box);
         }
-        //푸쉬용 주석
         //if (Input.GetKeyDown(KeyCode.X))
 
     }
