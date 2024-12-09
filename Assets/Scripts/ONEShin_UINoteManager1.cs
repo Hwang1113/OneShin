@@ -396,8 +396,15 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     public void Stage1Note(AudioSource _stage1AudioSource)
     {
         _stage1AudioSource.Play();
+        int[] zerobox =
+        {
+            0,0,0,0,
+            0,0,0,0,
+            0,0,0,0,
+            0,0,0,0
+        }; 
         int[] onebox =
-{
+        {
             1,0,0,0,
             0,1,0,0,
             0,0,1,0,
@@ -410,6 +417,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
             0,1,0,0,
             1,0,0,0
         };
+        NotebyBarintlist(0, zerobox);
         NotebyBarintlist(1, onebox);
         NotebyBarintlist(2, twobox);
 
