@@ -28,6 +28,13 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     public float NotebilTime = 0;
     public int beatCnt = 0;
     public const float bpm = 0;
+    public int[] zerobox =
+        {
+            0,0,0,0,
+            0,0,0,0,
+            0,0,0,0,
+            0,0,0,0
+        };
     // 라이프 매니저를 여기서 선언해서 라이프가 깎였을때 라이프 매니저 스크립트에 접근할 수 있게 선언이 필요함 12.05
 
     #endregion
@@ -66,7 +73,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         {
             if (_Notebox != null)
             {
-                _Notebox.rectTransform.anchoredPosition = Vector3.Lerp(Noteboxes[_noteIndex].rectTransform.anchoredPosition, Hitboxes[_noteIndex].rectTransform.anchoredPosition, time * 10 / 8f);
+                _Notebox.rectTransform.anchoredPosition = Vector3.Lerp(Noteboxes[_noteIndex].rectTransform.anchoredPosition, Hitboxes[_noteIndex].rectTransform.anchoredPosition, time * 10 / 7f);
                 _Notebox.rectTransform.sizeDelta = Vector3.Lerp(Noteboxes[_noteIndex].rectTransform.sizeDelta, Vector2.zero, 5 * time - 4);
             }
             if (time > 1f)
@@ -75,7 +82,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
             }
             if (time > Stoptimings[_noteIndex])
                 Stoptimings[_noteIndex] = time;
-            time += Time.deltaTime * Bpm / 60f * 0.5f;
+            time += Time.deltaTime * Bpm / 60f * 0.25f;
             yield return null;
         }
         if (_Notebox != null)
@@ -212,47 +219,34 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         bool push2 = false;
         bool push3 = false;
         bool push4 = false;
-        _bar = (_bar * 4) - 4;
+        float barinbil = (_bar * 4) - 4;
         while (true)
         {
+            Debug.Log(barinbil);
             time += Time.deltaTime * Bpm / 60f * 1f;
             if (time > 1)
             {
                 time %= 1;
-                _bar--;
+                barinbil--;
             }
-            if (_bar == 0 && !push1)
+            if (barinbil == 0 && !push1)
                 { if (_boxlist[0] == 1) PushNote(2); if (_boxlist[1] == 1) PushNote(3); if (_boxlist[2] == 1) PushNote(1); if (_boxlist[3] == 1) PushNote(0); push1 = true; }            
-            if (_bar == -1 && !push2)
+            if (barinbil == -1 && !push2)
                 { if (_boxlist[4] == 1) PushNote(2); if (_boxlist[5] == 1) PushNote(3); if (_boxlist[6] == 1) PushNote(1); if (_boxlist[7] == 1) PushNote(0); push2 = true; }          
-            if (_bar == -2 && !push3)
+            if (barinbil == -2 && !push3)
                 { if (_boxlist[8] == 1) PushNote(2); if (_boxlist[9] == 1) PushNote(3); if (_boxlist[10] == 1) PushNote(1); if (_boxlist[11] == 1) PushNote(0); push3 = true; }          
-            if (_bar == -3 && !push4)
+            if (barinbil == -3 && !push4)
                 { if (_boxlist[12] == 1) PushNote(2); if (_boxlist[13] == 1) PushNote(3); if (_boxlist[14] == 1) PushNote(1); if (_boxlist[15] == 1) PushNote(0); push4 = true; }
-            NotebilTime = time;
+            if (barinbil == -4)
+                yield break;
+
             yield return null;
         }
-
     }
+
 
     public bool sampleNotesComming()
     {
-        int onebar = 1;
-        int twobar = 2;
-        int[] onebox =
-        {
-            1,0,0,0,
-            0,1,0,0,
-            0,0,1,0,
-            0,0,0,1
-        };
-        int[] twobox =
-        {
-            0,0,0,1,
-            0,0,1,0,
-            0,1,0,0,
-            1,0,0,0
-        };
         int[] pattern1box =
         {
             0,0,0,1,
@@ -295,8 +289,8 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
             1,0,0,0,
             1,0,0,0
         };
-        NotebyBarintlist(onebar, pattern1box);
-        NotebyBarintlist(twobar, pattern2box);
+        NotebyBarintlist(1, pattern1box);
+        NotebyBarintlist(2, pattern2box);
         NotebyBarintlist(3, pattern3box);
         NotebyBarintlist(4, pattern4box);
         NotebyBarintlist(5, pattern5box);
@@ -389,39 +383,6 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     public int ChecklifeCnt
     {
         get { return lifeCnt; }  // 값을 반환
-    }
-    #endregion
-    #region 스테이지 1 오디오에 맞춰 노트 찍기
-
-    public void Stage1Note(AudioSource _stage1AudioSource)
-    {
-        _stage1AudioSource.Play();
-        int[] zerobox =
-        {
-            0,0,0,0,
-            0,0,0,0,
-            0,0,0,0,
-            0,0,0,0
-        }; 
-        int[] onebox =
-        {
-            1,0,0,0,
-            0,1,0,0,
-            0,0,1,0,
-            0,0,0,1
-        };
-        int[] twobox =
-        {
-            0,0,0,1,
-            0,0,1,0,
-            0,1,0,0,
-            1,0,0,0
-        };
-        NotebyBarintlist(0, zerobox);
-        NotebyBarintlist(1, onebox);
-        NotebyBarintlist(2, twobox);
-
-            //0,12.2,34 
     }
     #endregion
     #endregion
