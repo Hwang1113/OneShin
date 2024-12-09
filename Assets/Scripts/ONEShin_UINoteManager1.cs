@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,10 +22,12 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     public int lifeCnt = 5;
     public bool isLifeZero = false; // 라이프 0이 됐을때 true
     public int totalNoteCnt = 0;
-    public float Bpm = 60; // 음악 템포 또는 BPM 형식
+    public float Bpm = 0; // 음악 템포 또는 BPM 형식
     public bool isFever = false;
-    public const int EnterFeverCnt = 100; 
-
+    public const int EnterFeverCnt = 100;
+    public float NotebilTime = 0;
+    public int beatCnt = 0;
+    public const float bpm = 0;
     // 라이프 매니저를 여기서 선언해서 라이프가 깎였을때 라이프 매니저 스크립트에 접근할 수 있게 선언이 필요함 12.05
 
     #endregion
@@ -72,7 +75,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
             }
             if (time > Stoptimings[_noteIndex])
                 Stoptimings[_noteIndex] = time;
-            time += Time.deltaTime * Bpm * 0.005f;
+            time += Time.deltaTime * Bpm / 60f * 0.5f;
             yield return null;
         }
         if (_Notebox != null)
@@ -88,13 +91,12 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     // 노트 판정 제거 함수 (퍼펙 점수 +50, 굿 +10 - 둘다 ComboCnt++;, 배드는 콤보 0으로 초기화 lifeCnt--;)
     public void HitNote(int _noteIndex)
     {
-        Debug.Log(Score);
+        //Debug.Log(Score);
         if (isFever)
         { 
             feverTimeHit();
 
         }
-
         StartCoroutine(HitNoteCo(_noteIndex));
     }
 
@@ -213,7 +215,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         _bar = (_bar * 4) - 4;
         while (true)
         {
-            time += Time.deltaTime * Bpm * 0.01f;
+            time += Time.deltaTime * Bpm / 60f * 1f;
             if (time > 1)
             {
                 time %= 1;
@@ -227,6 +229,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
                 { if (_boxlist[8] == 1) PushNote(2); if (_boxlist[9] == 1) PushNote(3); if (_boxlist[10] == 1) PushNote(1); if (_boxlist[11] == 1) PushNote(0); push3 = true; }          
             if (_bar == -3 && !push4)
                 { if (_boxlist[12] == 1) PushNote(2); if (_boxlist[13] == 1) PushNote(3); if (_boxlist[14] == 1) PushNote(1); if (_boxlist[15] == 1) PushNote(0); push4 = true; }
+            NotebilTime = time;
             yield return null;
         }
 
@@ -386,6 +389,34 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     public int ChecklifeCnt
     {
         get { return lifeCnt; }  // 값을 반환
+    }
+    #endregion
+    #region 스테이지 1 오디오에 맞춰 노트 찍기
+
+    public void Stage1Note(AudioSource _stage1AudioSource,float _bpm)
+    {
+        SetBpm(_bpm);
+        _stage1AudioSource.Play();
+        int[] onebox =
+{
+            1,0,0,0,
+            0,1,0,0,
+            0,0,1,0,
+            0,0,0,1
+        };
+        int[] twobox =
+        {
+            0,0,0,1,
+            0,0,1,0,
+            0,1,0,0,
+            1,0,0,0
+        };
+        if (Bpm == _bpm)
+        {
+            NotebyBarintlist(1, onebox);
+            NotebyBarintlist(2, twobox);
+        }
+            //0,12.2,34 
     }
     #endregion
     #endregion

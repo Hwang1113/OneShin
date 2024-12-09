@@ -5,20 +5,19 @@ public class FourByFour : MonoBehaviour
     [SerializeField]
     private ONEShin_UINoteManager1 UINMg = null;
     [SerializeField]
-    //private AudioClip bgm = null;
-    //private AudioSource audioSource = null;
+    private AudioSource audioSource = null;
 
     private void Awake()
     {
-        //audioSource = GetComponent<AudioSource>();
+        audioSource = GetComponentInChildren<AudioSource>();
         UINMg = GetComponentInChildren<ONEShin_UINoteManager1>();
     }
     private void Start()
     {
         UINMg.Score0();
-        UINMg.SetBpm(120); //240 BPM 으로설정
-        UINMg.sampleNotesComming();
-        //audioSource.clip = bgm;
+        //UINMg.SetBpm(110); // 곡은 110BPM으로 측정됌
+        //UINMg.sampleNotesComming();
+
         //audioSource.Play();
     }
 
@@ -44,7 +43,10 @@ public class FourByFour : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F))
             UINMg.PushNote(0);
         // 디버그용 콤보 99로 만들기
-        if (Input.GetKeyDown(KeyCode.H))
-            UINMg.AddCombo99();
+        //if (Input.GetKeyDown(KeyCode.H))
+        //UINMg.AddCombo99();
+
+        if (Input.GetKeyDown(KeyCode.Z))
+            UINMg.Stage1Note(audioSource, 220);
     }
 }
