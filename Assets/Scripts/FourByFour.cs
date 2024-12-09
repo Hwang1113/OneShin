@@ -142,7 +142,7 @@ public class FourByFour : MonoBehaviour
             UINMg.NotebyBarintlist(83, pattern7box);
             UINMg.NotebyBarintlist(84, pattern7box);
         }
-
+        //Çª½¬¿ë ÁÖ¼®
         //if (Input.GetKeyDown(KeyCode.X))
 
     }
