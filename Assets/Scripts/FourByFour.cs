@@ -15,7 +15,7 @@ public class FourByFour : MonoBehaviour
     private void Start()
     {
         UINMg.Score0();
-        //UINMg.SetBpm(110); // 곡은 110BPM으로 측정됌
+        UINMg.SetBpm(110); // 곡은 110BPM으로 측정됌
         //UINMg.sampleNotesComming();
 
         //audioSource.Play();
@@ -47,6 +47,6 @@ public class FourByFour : MonoBehaviour
         //UINMg.AddCombo99();
 
         if (Input.GetKeyDown(KeyCode.Z))
-            UINMg.Stage1Note(audioSource, 220);
+            UINMg.Stage1Note(audioSource);
     }
 }

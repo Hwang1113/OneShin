@@ -393,9 +393,8 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     #endregion
     #region 스테이지 1 오디오에 맞춰 노트 찍기
 
-    public void Stage1Note(AudioSource _stage1AudioSource,float _bpm)
+    public void Stage1Note(AudioSource _stage1AudioSource)
     {
-        SetBpm(_bpm);
         _stage1AudioSource.Play();
         int[] onebox =
 {
@@ -411,11 +410,9 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
             0,1,0,0,
             1,0,0,0
         };
-        if (Bpm == _bpm)
-        {
-            NotebyBarintlist(1, onebox);
-            NotebyBarintlist(2, twobox);
-        }
+        NotebyBarintlist(1, onebox);
+        NotebyBarintlist(2, twobox);
+
             //0,12.2,34 
     }
     #endregion
