@@ -16,7 +16,7 @@ public class FourByFour : MonoBehaviour
     {
         UINMg.Score0();
         UINMg.SetBpm(220); // 곡은 110BPM으로 측정됌 현재 만든 코루틴이 4분음표 첫만 가능해서 220bpm 으로 
-        UINMg.NotebyBarintlist(0, UINMg.zerobox);
+
         //UINMg.sampleNotesComming();
 
         //audioSource.Play();

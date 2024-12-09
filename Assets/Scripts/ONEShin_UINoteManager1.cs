@@ -28,13 +28,6 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
     public float NotebilTime = 0;
     public int beatCnt = 0;
     public const float bpm = 0;
-    public int[] zerobox =
-        {
-            0,0,0,0,
-            0,0,0,0,
-            0,0,0,0,
-            0,0,0,0
-        };
     // 라이프 매니저를 여기서 선언해서 라이프가 깎였을때 라이프 매니저 스크립트에 접근할 수 있게 선언이 필요함 12.05
 
     #endregion
@@ -239,7 +232,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
                 { if (_boxlist[8] == 1) PushNote(2); if (_boxlist[9] == 1) PushNote(3); if (_boxlist[10] == 1) PushNote(1); if (_boxlist[11] == 1) PushNote(0); push3 = true; }
                 if (barinbil == -3 && !push4)
                 { if (_boxlist[12] == 1) PushNote(2); if (_boxlist[13] == 1) PushNote(3); if (_boxlist[14] == 1) PushNote(1); if (_boxlist[15] == 1) PushNote(0); push4 = true; }
-                if (barinbil == -4)
+                if (barinbil == -4) // 최적화 무한히 가는걸 막음
                     yield break;
             }
 
@@ -247,7 +240,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         }
     }
 
-
+    //테스트 용 노트 여러개 보내기
     public bool sampleNotesComming()
     {
         int[] pattern1box =
@@ -309,10 +302,9 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         NotebyBarintlist(15, pattern4box);
         NotebyBarintlist(16, pattern2box);
         NotebyBarintlist(17, pattern3box);
-
         //Debug.Log("sampleNotesComming");
         return true;
-    } //테스트 용 노트 여러개 보내기
+    } 
     #endregion
     #region 퍼블릭 변수 제어
     public void Score0()
@@ -347,9 +339,9 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
             return ("오류 랭크정산 안됌");
     }
 
-    public void AddCombo99() // 콤보에 99 더하기
+    public void Combo99() // 콤보 99로 만들기 
     {
-        ComboCnt += 99;
+        ComboCnt = 99;
     }
 
     #endregion
