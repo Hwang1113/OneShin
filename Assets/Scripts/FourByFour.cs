@@ -15,7 +15,7 @@ public class FourByFour : MonoBehaviour
     private void Start()
     {
         UINMg.Score0();
-        UINMg.SetBpm(220); // 곡은 110BPM으로 측정됌
+        UINMg.SetBpm(220); // 곡은 110BPM으로 측정됌 현재 만든 코루틴이 4분음표 첫만 가능해서 220bpm 으로 
         UINMg.NotebyBarintlist(0, UINMg.zerobox);
         //UINMg.sampleNotesComming();
 
@@ -49,6 +49,13 @@ public class FourByFour : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Z))
         {
+            int[] zerobox =
+            {
+            0,0,0,0,
+            0,0,0,0,
+            0,0,0,0,
+            0,0,0,0
+            };
 
             int[] pattern1box =
             {
@@ -126,8 +133,16 @@ public class FourByFour : MonoBehaviour
             //8마디 9번 반복
             for (int i = 0; i < 80; i += 8)
             {
-                UINMg.NotebyBarintlist(i, pattern1box); 
-                UINMg.NotebyBarintlist(i + 1, pattern2box);   
+                UINMg.NotebyBarintlist(i, pattern1box);
+                if (i == 8 && i == 24)//특정 마디 다른 패턴 사용 예제
+                {
+                    UINMg.NotebyBarintlist(i + 1, pattern9box); // 특정 패턴
+
+                }
+                else
+                {
+                    UINMg.NotebyBarintlist(i + 1, pattern2box); //원래 패턴
+                }
                 UINMg.NotebyBarintlist(i + 2, pattern3box);   
                 UINMg.NotebyBarintlist(i + 3, pattern4box);   
                 UINMg.NotebyBarintlist(i + 4, pattern5box);   
