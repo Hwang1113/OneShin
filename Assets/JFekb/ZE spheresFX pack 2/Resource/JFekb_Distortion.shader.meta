@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 86214daf4c2ecf547a79e259020b394b
+timeCreated: 1494164454
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 90093
+  packageName: ZE spheresFX pack 2
+  packageVersion: 1.0
+  assetPath: Assets/JFekb/ZE spheresFX pack 2/Resource/JFekb_Distortion.shader
+  uploadId: 178937

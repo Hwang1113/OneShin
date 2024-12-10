@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 22dd603925a04d84d83f08ea0f71eeb1
+timeCreated: 1494164449
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 90093
+  packageName: ZE spheresFX pack 2
+  packageVersion: 1.0
+  assetPath: Assets/JFekb/ZE spheresFX pack 2/Resource/ZESpheres_LightParticles.cs
+  uploadId: 178937

@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 4b79f585d107ced4e892ce7225de8170
+timeCreated: 1494164449
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 90093
+  packageName: ZE spheresFX pack 2
+  packageVersion: 1.0
+  assetPath: Assets/JFekb/ZE spheresFX pack 2/Resource/ZE_MagicSphereDemoGUI.cs
+  uploadId: 178937

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 00726b866418e2d4aad2bbc70991f575
+timeCreated: 1494164454
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 90093
+  packageName: ZE spheresFX pack 2
+  packageVersion: 1.0
+  assetPath: Assets/JFekb/ZE spheresFX pack 2/Resource/Particle Alpha Blend.shader
+  uploadId: 178937

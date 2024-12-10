@@ -1,81 +1,203 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.UIElements;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 
 
 public class ONEShin_UINoteManager1 : MonoBehaviour
 {
-    #region private º¯¼ö
-    private List<Image> Hitboxes = new List<Image>(); // Q, W, E, R¿¡ ´ëÇÑ È÷Æ®¹Ú½º¸¦ ¸®½ºÆ®·Î °ü¸®
-    private List<Image> Noteboxes = new List<Image>(); // Q, W, E, R¿¡ ´ëÇÑ ³ëÆ®¹Ú½º¸¦ ¸®½ºÆ®·Î °ü¸®
-    public List<Image> Accuracy = new List<Image>(); // Accuracy¸¦ ¸®½ºÆ®·Î °ü¸® (Perfect,Good,Bad)
-    private List<Vector2> NoteboxStartPoints = new List<Vector2>(); // °¢ ³ëÆ® Å¸ÀÔÀÇ ½ÃÀÛ À§Ä¡¸¦ ¸®½ºÆ®·Î °ü¸®
-    private List<Vector2> NoteBoxEndPoints = new List<Vector2>(); // °¢ ³ëÆ® Å¸ÀÔÀÇ ³¡ À§Ä¡¸¦ ¸®½ºÆ®·Î °ü¸®
-    private List<Queue<Image>> NoteQueues = new List<Queue<Image>>(); // °¢ ³ëÆ® Å¸ÀÔÀÇ Å¥¸¦ ¸®½ºÆ®·Î °ü¸®
-    private float[] Stoptimings = new float[4]; // ½ºÅ¾ Å¸ÀÌ¹Ö ¹è¿­
-    #endregion
-    #region public º¯¼ö
-    public int ComboCnt = 0; //ÄŞº¸ Ä«¿îÆ®
-    public int Score = 0; // Á¡¼ö 
-    public int lifeCnt = 5;
-    public bool isLifeZero = false; // ¶óÀÌÇÁ 0ÀÌ µÆÀ»¶§ true
-    public int totalNoteCnt = 0;
-    public float Bpm = 0; // À½¾Ç ÅÛÆ÷ ¶Ç´Â BPM Çü½Ä
-    public bool isFever = false;
-    public const int EnterFeverCnt = 100;
-    public float NotebilTime = 0;
-    public int beatCnt = 0;
-    public const float bpm = 0;
-    // ¶óÀÌÇÁ ¸Å´ÏÀú¸¦ ¿©±â¼­ ¼±¾ğÇØ¼­ ¶óÀÌÇÁ°¡ ±ğ¿´À»¶§ ¶óÀÌÇÁ ¸Å´ÏÀú ½ºÅ©¸³Æ®¿¡ Á¢±ÙÇÒ ¼ö ÀÖ°Ô ¼±¾ğÀÌ ÇÊ¿äÇÔ 12.05
+    #region private ë³€ìˆ˜
+    private List<Image> Hitboxes = new List<Image>(); // Q, W, E, Rì— ëŒ€í•œ íˆíŠ¸ë°•ìŠ¤ë¥¼ ë¦¬ìŠ¤íŠ¸ë¡œ ê´€ë¦¬
+    private List<Image> Noteboxes = new List<Image>(); // Q, W, E, Rì— ëŒ€í•œ ë…¸íŠ¸ë°•ìŠ¤ë¥¼ ë¦¬ìŠ¤íŠ¸ë¡œ ê´€ë¦¬
+    private float[] Stoptimings = new float[4]; // ìŠ¤íƒ‘ íƒ€ì´ë° ë°°ì—´
+    private List<Vector2> NoteboxStartPoints = new List<Vector2>(); // ê° ë…¸íŠ¸ íƒ€ì…ì˜ ì‹œì‘ ìœ„ì¹˜ë¥¼ ë¦¬ìŠ¤íŠ¸ë¡œ ê´€ë¦¬
+    private List<Vector2> NoteBoxEndPoints = new List<Vector2>(); // ê° ë…¸íŠ¸ íƒ€ì…ì˜ ë ìœ„ì¹˜ë¥¼ ë¦¬ìŠ¤íŠ¸ë¡œ ê´€ë¦¬
+    private List<Queue<Image>> NoteQueues = new List<Queue<Image>>(); // ê° ë…¸íŠ¸ íƒ€ì…ì˜ íë¥¼ ë¦¬ìŠ¤íŠ¸ë¡œ ê´€ë¦¬
 
+    //ì¶”ê°€
+    private int score = 0; // ì¶”ê°€
+    private bool isGameOver = false; // ì¶”ê°€2
+    private int scoreToAdd; // ì¶”ê°€2 ì ìˆ˜ ë³€ìˆ˜ë¥¼ í´ë˜ìŠ¤ í•„ë“œë¡œ ì„ ì–¸
+    private float clearTimer; // ì¶”ê°€ 58ì´ˆ í›„ í´ë¦¬ì–´ UIë¥¼ ë„ìš°ê¸° ìœ„í•œ íƒ€ì´ë¨¸
+    private bool isClearTimerStarted = false; // ì¶”ê°€ íƒ€ì´ë¨¸ ì‹œì‘ ì—¬ë¶€
+    private bool isClearTriggered = false; // ì¶”ê°€ í´ë¦¬ì–´ UI í‘œì‹œ ì—¬ë¶€
+    private bool isCheat=false;
+    private float feverTime = 0f;
     #endregion
-    #region private
+    #region public ë³€ìˆ˜
+    public int ComboCnt = 0; //ì½¤ë³´ ì¹´ìš´íŠ¸
+    public int Score = 0; // ì ìˆ˜ 
+    public float Bpm = 60; // ìŒì•… í…œí¬ ë˜ëŠ” BPM í˜•ì‹
+    public bool isGameover = false; // FourbyFourê°€ ì˜¤ë””ì˜¤ ê´€ë¦¬ì¤‘ì´ê³  í˜„ì¬ ìŠ¤í¬ë¦½íŠ¸ ë¶€ëª¨ì—ê²Œ ì•Œë¦´ bool ë³€ìˆ˜ ì„ ì–¸ 12.10
+    private bool isFever = false; // FeverMode ìƒíƒœ Bool ê°’ì„ ì €ì¥í•  ë³€ìˆ˜ 12.10
+    private int NoteCnt = 0; // ë…¸íŠ¸ê°€ ëª‡ê°œ í‘¸ì‰¬ëëŠ”ì§€ ì•Œë ¤ì£¼ëŠ” ë³€ìˆ˜ Push í• ë•Œë§ˆë‹¤ ++ í•  ì˜ˆì •
+    #endregion
+
+    // ì¶”ê°€
+    public JudgeUIManager judgeUIManager; // ì¶”ê°€2
+    public ScoreManager scoreManager; // ì¶”ê°€2
+    public Stage1UIManager stage1UIManager; // ì¶”ê°€
+
+
     private void Awake()
     {
-        // Q, W, E, R¿¡ ´ëÇÑ Hitbox¿Í Notebox ÃÊ±âÈ­
+      
+        // Q, W, E, Rì— ëŒ€í•œ Hitboxì™€ Notebox ì´ˆê¸°í™”
         for (int i = 0; i < 4; i++)
         {
             Hitboxes.Add(transform.GetChild(i).GetComponent<Image>());
             Noteboxes.Add(Hitboxes[i].GetComponentsInChildren<Image>()[1]);
             NoteQueues.Add(new Queue<Image>());
         }
-        // °¢ ³ëÆ®ÀÇ ½ÃÀÛ À§Ä¡¿Í ³¡ À§Ä¡ ¼³Á¤
+
+        // ê° ë…¸íŠ¸ì˜ ì‹œì‘ ìœ„ì¹˜ì™€ ë ìœ„ì¹˜ ì„¤ì •
         for (int i = 0; i < 4; i++)
         {
             NoteboxStartPoints.Add(Noteboxes[i].rectTransform.anchoredPosition);
             NoteBoxEndPoints.Add(Hitboxes[i].rectTransform.anchoredPosition + new Vector2(-Hitboxes[i].rectTransform.sizeDelta.x, Hitboxes[i].rectTransform.sizeDelta.y));
         }
-
-        Accuracy.AddRange(transform.GetChild(4).GetComponentsInChildren<Image>(false));
-
-        foreach (Image img in Accuracy)
-        {
-            img.gameObject.SetActive(false);  // ÇØ´ç GameObject ºñÈ°¼ºÈ­
-        }
-        // ¶óÀÌÇÁ ¸Å´ÏÀú¸¦ ¿©±â¼­ ¼±¾ğÇØ¼­ ¶óÀÌÇÁ°¡ ±ğ¿´À»¶§ ¶óÀÌÇÁ ¸Å´ÏÀú ½ºÅ©¸³Æ®¿¡ Á¢±ÙÇÒ ¼ö ÀÖ°Ô [SerializeField]¸¦ ¾ÈÇßÀ¸¸é ¿©±â¼­ ¾î¶»°Ôµç °¡Á®¿Í¾ßÇÔ 12.05
-
     }
+
+    private void Update()
+    {
+        // ì¶”ê°€2 LifeManagerì—ì„œ ê²Œì„ ì˜¤ë²„ ìƒíƒœ í™•ì¸
+        if (LifeManager.Instance != null && LifeManager.Instance.IsGameOver)
+        {
+            if(!isGameOver)
+            {
+                isGameOver = true;
+                isGameover = true; // í˜„ì¬ ìŠ¤í¬ë¦½íŠ¸ ë¶€ëª¨ FourbyFourê°€ ì˜¤ë””ì˜¤ ê´€ë¦¬ì¤‘ì´ê³  í¼ë¸”ë¦­ ë³€ìˆ˜ë¡œ ê²Œì„ ì˜¤ë²„ ë¼ì—ˆë‹¤ê³  ì•Œë¦¼ 12.10 
+                StopAllNotes();
+            }
+        }
+        //ì¶”ê°€
+        // íƒ€ì´ë¨¸ê°€ ì‹œì‘ë˜ì§€ ì•Šì•˜ë‹¤ë©´ ì‹œì‘
+        if (!isClearTimerStarted)
+        {
+            StartClearTimer();
+        }
+        // ì¶”ê°€ íƒ€ì´ë¨¸ ì²´í¬
+        if (isClearTimerStarted && !isClearTriggered)
+        {
+            clearTimer -= Time.deltaTime;
+            if (clearTimer <= 0f)
+            {
+                isFever = true;
+                TriggerClearUI();
+                StopAllNotes();
+            }
+        }
+
+        if(isFever && feverTime<5)
+        {
+            feverTime += Time.deltaTime;
+        }
+    }
+
+
+    // ì¶”ê°€2
+    private void StopAllNotes()
+    {
+        // ë…¸íŠ¸ ìƒì„± ë° ì´ë™ ì¤‘ì§€
+        CancelInvoke();
+
+        // ê¸°ì¡´ì— ìƒì„±ëœ ë…¸íŠ¸ ì œê±°
+        foreach ( var queue in NoteQueues)
+        {
+            while (queue.Count > 0)
+            {
+                Image note = queue.Dequeue(); // note ë³€ìˆ˜ë¥¼ ì„ ì–¸
+                Destroy(note.gameObject);
+            }
+        }
+
+        foreach (var hitbox in Hitboxes)
+        {
+            if (hitbox != null)
+            {
+                hitbox.gameObject.SetActive(false); // íˆíŠ¸ë°•ìŠ¤ ë¹„í™œì„±í™”
+            }
+        }
+
+        // ê²Œì„ ì˜¤ë²„ ì‹œ JudgeUIManagerì˜ OnGameOver í˜¸ì¶œ
+        JudgeUIManager.Instance?.OnGameOver();
+    }
+
+
+    // ì¶”ê°€ íƒ€ì´ë¨¸
+    private void StartClearTimer()
+    {
+        isClearTimerStarted = true;
+        clearTimer = 90f; // 58ì´ˆ íƒ€ì´ë¨¸ ì„¤ì •
+    }
+
+    // ì¶”ê°€ í´ë¦¬ì–´ í‘œì‹œ
+    private void TriggerClearUI()
+    {
+        if (LifeManager.Instance != null && LifeManager.Instance.IsGameOver)
+        {
+            return;
+        }
+
+        isClearTriggered = true;
+
+        // Stage1UIManagerë¥¼ í†µí•´ í´ë¦¬ì–´ UI í‘œì‹œ
+        if (stage1UIManager != null)
+        {
+            stage1UIManager.ShowClearUI();
+
+            // í´ë¦¬ì–´ ì‹œ JudgeUIManagerì˜ OnGameClear í˜¸ì¶œ
+            JudgeUIManager.Instance?.OnGameClear();
+
+        }
+        else
+        {
+            Debug.LogError("Stage1UIManager ì—°ê²°í•„ìš”");
+        }
+    }
+
+    private void FeverModeHit() //12.01 í”¼ë²„ëª¨ë“œ íˆíŠ¸ë‹¹ ì ìˆ˜ +1 
+    {
+        int FeverScore = 1;
+        if (0 <= feverTime && feverTime <  5f)
+        {
+            scoreManager.AddScore(FeverScore);
+            stage1UIManager.ShowClearUI();
+        }
+    }
+
+    #region private
+    // ë…¸íŠ¸ë¥¼ ìƒì„±í•˜ëŠ” í•¨ìˆ˜ (Q, W, E, Rì— ë§ê²Œ)
+
+    // ë…¸íŠ¸ë¥¼ ìƒì„±í•˜ê³  ì´ë™ì‹œí‚¤ëŠ” í•¨ìˆ˜
+    private void CreateMoveNoteToHit(int _noteIndex)
+    {
+        if (isGameOver) return; // ì¶”ê°€2 ê²Œì„ì˜¤ë²„ ìƒíƒœì—ì„œëŠ” ë…¸íŠ¸ ìƒì„± ê¸ˆì§€
+
+        Image noteGo = Instantiate(Noteboxes[_noteIndex], Hitboxes[_noteIndex].transform);
+        NoteQueues[_noteIndex].Enqueue(noteGo);
+        StartCoroutine(CreateMoveNoteToHitCoroutine(noteGo, _noteIndex));
+    }
+    // ë…¸íŠ¸ë¥¼ íˆíŠ¸ë°•ìŠ¤ê¹Œì§€ ì´ë™ì‹œí‚¤ëŠ” ì½”ë£¨í‹´
     private IEnumerator CreateMoveNoteToHitCoroutine(Image _Notebox, int _noteIndex)
     {
         _Notebox.gameObject.SetActive(true);
-        //Stoptimings[_noteIndex] = 0f;// ¿©±â¼­ °ãÄ¡´Â ¹®Á¦°¡ »ı±äµí? ¿øÀÎÀÌ ÀÌÀü 2°³ÀÌ»ó »ı°åÀ»¶§ µ¶¸³ÀûÀ¸·Î »ı¼ºµÇ´Â°Ô ¾Æ´ÑµíÇÔ
+
+        //Stoptimings[_noteIndex] = 0f; ìƒˆë¡œ ìƒì„±ëœ ë…¸íŠ¸ê°€ì˜ timeì€ 0ì´ë¼ì„œ Stoptimings[_noteIndex] 0ìœ¼ë¡œ ì´ˆê¸°í™” ë˜ì–´ì•¼ í•˜ëŠ”ê²Œ ì•„ë‹ˆê³  (0ì¸ ì§„ì§œ ì ê¹ì˜ ìˆœê°„ì— hit í•˜ë©´ ì‘ë™ ì•ˆí•  ê²ƒì´ë‹¤.) 12.10
         float time = 0f;
+        if (0.4 < Stoptimings[_noteIndex])  // ë…¸íŠ¸ê°€ ìƒì„±ëì„ë•Œ íŒì • ë²”ìœ„ì•ˆì— ë…¸íŠ¸ê°€ ìˆìœ¼ë©´ ìŠ¤íƒ‘ íƒ€ì´ë°ì„ ì´ˆê¸°í™” í•˜ì§€ ì•ŠëŠ”ê²Œ ë§ê³  0.4ë¯¸ë§Œì€ 0ìœ¼ë¡œ ì´ˆê¸°í™” í•˜ì—¬ë„ whileë¬¸ì„ ë„ëŠ” ë™ì•ˆ ìŠ¤íƒ‘ íƒ€ì´ë°ì´ ìµœì‹ í™” ëœë‹¤ 12.10
+            Stoptimings[_noteIndex] = 0f;    
         while (time < 1f && _Notebox != null)
         {
             if (_Notebox != null)
             {
-                _Notebox.rectTransform.anchoredPosition = Vector3.Lerp(Noteboxes[_noteIndex].rectTransform.anchoredPosition, Hitboxes[_noteIndex].rectTransform.anchoredPosition, time * 10 / 7f);
+                _Notebox.rectTransform.anchoredPosition = Vector3.Lerp(Noteboxes[_noteIndex].rectTransform.anchoredPosition, Hitboxes[_noteIndex].rectTransform.anchoredPosition, time * 10 / 8f);
                 _Notebox.rectTransform.sizeDelta = Vector3.Lerp(Noteboxes[_noteIndex].rectTransform.sizeDelta, Vector2.zero, 5 * time - 4);
             }
-            if (time > 1f)
-            {
-                time = 1f;
-            }
-            if (time > Stoptimings[_noteIndex])
+            if (time > Stoptimings[_noteIndex]) // 12.10 ë²„ê·¸ ìˆ˜ì • ìš”ì†Œê°€ ì ìš© ì•ˆë¼ì„œ ë‹¤ì‹œ ì‘ì„±í•¨ ì´ ì¡°ê±´ë¬¸ì´ ì—†ìœ¼ë©´ ë™ì‹œì— ë“¤ì–´ì˜¤ëŠ” ë…¸íŠ¸ ì „ë¶€ê°€ Stoptimings[_noteIndex] ì„ ìˆ˜ì •í•´ì„œ HitNoteê°€ ì œëŒ€ë¡œ ì‘ë™ í•˜ì§€ ì•ŠìŒ ì¤‘ìš”!
                 Stoptimings[_noteIndex] = time;
-            time += Time.deltaTime * Bpm / 60f * 0.25f;
+            time += Time.deltaTime * Bpm * 0.005f;
             yield return null;
         }
         if (_Notebox != null)
@@ -84,301 +206,330 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
             _Notebox.rectTransform.anchoredPosition = NoteBoxEndPoints[_noteIndex];
             HitNote(_noteIndex);
         }
+        //Stoptimings[_noteIndex] = 0f; ëë‚˜ê³  ì´ˆê¸°í™”ë¥¼ í•  í•„ìš”ê°€ ì—†ìŒ 12.10
     }
+
     #endregion
+
     #region public
-    #region ³ëÆ® ÆÇÁ¤ ÈÄ Á¦°Å
-    // ³ëÆ® ÆÇÁ¤ Á¦°Å ÇÔ¼ö (ÆÛÆå Á¡¼ö +50, ±Â +10 - µÑ´Ù ComboCnt++;, ¹èµå´Â ÄŞº¸ 0À¸·Î ÃÊ±âÈ­ lifeCnt--;)
+
+
+    // ë…¸íŠ¸ íŒì • ì œê±° í•¨ìˆ˜ (í¼í™ ì ìˆ˜ +50, êµ¿ +10 - ë‘˜ë‹¤ ì½¤ë³´ì¹´ìš´íŠ¸++, ë°°ë“œëŠ” ì ìˆ˜ +0 - ì½¤ë³´ 0ìœ¼ë¡œ ì´ˆê¸°í™”)
     public void HitNote(int _noteIndex)
     {
-        //Debug.Log(Score);
+        // ì¶”ê°€2
+        string judgeResult = "Miss"; // ê¸°ë³¸ê°’ì€ Miss 
+        int scoreToAdd = 0; // ì ìˆ˜ ì´ˆê¸°í™”
         if (isFever)
-        { 
-            feverTimeHit();
-
-        }
-        StartCoroutine(HitNoteCo(_noteIndex));
-    }
-
-    public IEnumerator HitNoteCo(int _noteIndex)
-    {
-        // ´Ù¸¥ ³ëÆ®°¡ ´­·ÈÀ» ¶§ ÆĞ³ÎÆ¼ Àû¿ë
-        if (Stoptimings[_noteIndex] < 0.4f)
         {
-            if (!isFever) // ÇÇ¹öÅ¸ÀÓÀÌ ¾Æ´Ï¸é ÆĞ³ÎÆ¼ ÄŞº¸ Ä«¿îÆ® 0À¸·Î ÃÊ±âÈ­
-                ComboCnt = 0;   // ´Ù¸¥ ³ëÆ®°¡ ´­·ÈÀ¸¹Ç·Î, ÄŞº¸ ÃÊ±âÈ­
-            //ÇÇ¹ö Å¸ÀÓÀÌ¸é ÆĞ³ÎÆ¼ ¹ÌÀû¿ë  
+            FeverModeHit();
         }
-
-        if (Stoptimings[_noteIndex] >= 0.4f)
+        else
         {
-            if (NoteQueues[_noteIndex].Count > 0 && NoteQueues[_noteIndex] != null) //³ëÆ® ÆÄ±«
+            // ë‹¤ë¥¸ ë…¸íŠ¸ê°€ ëˆŒë ¸ì„ ë•Œ íŒ¨ë„í‹° ì ìš©
+            /*
+            if (Stoptimings[_noteIndex] < 0.4f)
             {
-                Image go = null;
-                if (NoteQueues[_noteIndex].TryDequeue(out go))
-                    Destroy(go.gameObject);
+                // ì¶”ê°€
+                LifeManager.Instance.LoseLife(); // ë¼ì´í”„ë§¤ë‹ˆì € í˜¸ì¶œ
+
             }
-            if (NoteQueues[_noteIndex].Count >= 0 && !isFever) // ÆÇÁ¤ Á¡¼ö °è»ê, ÇÇ¹öÅ¸ÀÓÀÌ¸é Á¡¼ö °è»ê ¾ÈÇÔ
+            */
+
+            if (Stoptimings[_noteIndex] >= 0.4f)
             {
-                if (0.4 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 0.6) //bad
+                if (NoteQueues[_noteIndex].Count > 0 && NoteQueues[_noteIndex] != null)
                 {
-                    ComboCnt = 0;
-                    lifeCnt--;
-                    //ÀÌ°÷¿¡ ¹Ù³ª³ª ³ª ¹ø°³ È£ÃâÇÏ¸é ‰Î 12.05ÇÒÀÏ 
-                    if (lifeCnt == 0)
-                        isLifeZero = true;
-                    StartCoroutine(ShowAccuracyUI(2));
+                    Image go = null;
+                    if (NoteQueues[_noteIndex].TryDequeue(out go))
+                    {    // ë…¸íŠ¸ íŒŒê´´ ì´í™íŠ¸ í˜¸ì¶œ
+                         // FxManager.Instance?.PlayNoteDestroyEffect(go.transform.position);
+                        Destroy(go.gameObject);
+                        //Debug.Log("íŒŒê´´"); 
+                    }
                 }
+                if (NoteQueues[_noteIndex].Count >= 0)
+                {
+                    if (0.3 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 0.6)
+                    {
+                        Debug.Log(Stoptimings[_noteIndex] + " Miss");
+                        ComboCnt = 0;
+                        judgeResult = "Miss"; // ì¶”ê°€, Miss UI 
+                    }
 
-                else if (0.6 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 0.75) //good
-                {
-                    ComboCnt++;
-                    Score += 10;
-                    if (ComboCnt != 0 && 0 == ComboCnt % EnterFeverCnt)
-                        StartCoroutine(StartFeverTime());
-                    StartCoroutine(ShowAccuracyUI(1));
+                    else if (0.6 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 0.8)
+                    {
+                        ComboCnt++;
+                        judgeResult = "Good"; // ì¶”ê°€, Good UI
+
+                        // ì¶”ê°€
+                        scoreToAdd = 10;
+                        UpdateScore(scoreToAdd);
+
+                        Debug.Log(Stoptimings[_noteIndex] + " Good Combo: " + ComboCnt + "Score : " + Score);
+                    }
+                    else if (0.8 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 1)
+                    {
+                        ComboCnt++;
+                        judgeResult = "Perfect";  // ì¶”ê°€, Perfect UI
+
+                        // ì¶”ê°€
+                        scoreToAdd = 50;
+                        UpdateScore(scoreToAdd);
+
+                        Debug.Log(Stoptimings[_noteIndex] + " Perfect Combo: " + ComboCnt + "Score : " + Score);
+                    }
+
+                    // ì¶”ê°€2 Missì¼ë•Œë§Œ ë¼ì´í”„ê°ì†Œ í˜¸ì¶œ
+                    if (judgeResult == "Miss" && !isCheat)
+                    {
+                        LifeManager.Instance.LoseLife();
+                        //Stoptimings[_noteIndex] = 0; //ì¶”ê°€2 Miss ì´í›„ íƒ€ì´ë° ì´ˆê¸°í™” // ìŠ¤íƒ‘íƒ€ì´ë° ì´ˆê¸°í™”ëŠ” ë…¸íŠ¸ê°€ íŒŒê´´ë˜ê³  ì´í›„ ì˜¤ëŠ” ë…¸íŠ¸ê°€ ì—†ì„ ì‹œ ì´ˆê¸°í™” í•´ì•¼í•œë‹¤, ì´í›„ ì˜¤ëŠ” ë…¸íŠ¸ê°€ ìˆìœ¼ë©´ ê·¸ ë…¸íŠ¸ê°€ ìŠ¤íƒ‘íƒ€ì´ë°ì„ ê´€ë¦¬í•˜ê¸° ë•Œë¬¸ 12.10
+                    }
 
                 }
-                else if (0.75 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 0.85) //perfect
+                // ì¶”ê°€2 íŒì • ê²°ê³¼ UI í‘œì‹œ
+                judgeUIManager.ShowJudgeUI(judgeResult);
+
+                // ì¶”ê°€2 ì ìˆ˜ ì—…ë°ì´íŠ¸
+                if (scoreManager != null)
                 {
-                    ComboCnt++;
-                    Score += 50;
-                    if (ComboCnt != 0 && 0 == ComboCnt % EnterFeverCnt)
-                        StartCoroutine(StartFeverTime());
-                    StartCoroutine(ShowAccuracyUI(0));
-                }
-                else if (0.85 <= Stoptimings[_noteIndex] && Stoptimings[_noteIndex] < 1)//good
-                {
-                    ComboCnt++;
-                    Score += 10;
-                    if (ComboCnt != 0 && 0 == ComboCnt % EnterFeverCnt)
-                        StartCoroutine(StartFeverTime());
-                    StartCoroutine(ShowAccuracyUI(1));
+                    scoreManager.AddScore(scoreToAdd); // ScoreManagerì— ì ìˆ˜ ì „ë‹¬
                 }
             }
+        }
+    }
 
-        }
-        yield return null;
-    }
-    //3ÃÊµ¿¾È Á¤È®µµ¸¦ ¾Ë·Á ÇØÁØ´Ù 0ÆÛÆå,1±»,2¹èµå
-    public IEnumerator ShowAccuracyUI(int _Accuracy) 
-    {
-        float time = 0f;
-        foreach (Image img in Accuracy)
-            img.gameObject.SetActive(false);
-        Accuracy[_Accuracy].gameObject.SetActive(true);
-        while (time < 2)
-        {
-            time += Time.deltaTime;
-            yield return null;
-        }
-        Accuracy[_Accuracy].gameObject.SetActive(false);
-    }
-    #endregion
-    #region ³ëÆ®»ı¼º
     public void PushNote(int _noteIndex)
     {
-        //CreateMoveNoteToHit(_noteIndex);
-        totalNoteCnt++;
-        Image noteGo = Instantiate(Noteboxes[_noteIndex], Hitboxes[_noteIndex].transform);
-        NoteQueues[_noteIndex].Enqueue(noteGo);
-        StartCoroutine(CreateMoveNoteToHitCoroutine(noteGo, _noteIndex));
-    } // ³ëÆ®(q2,w3,e0,r1) Áß ÇÏ³ª º¸³»±â
-
-    public void NotebyBarintlist(int _bar, int[] _boxlist)
-    {
-        StartCoroutine(NoteBil(_bar, _boxlist));
+        
+        {NoteCnt++; //12.10 ë…¸íŠ¸ê°¯ìˆ˜ ì¹´ìš´íŒ…
+        if (!isGameOver || !isClearTriggered) //ê²Œì„ì˜¤ë²„ê°€ ì•„ë‹ˆê±°ë‚˜ í´ë¦¬ì–´ê°€ ì•ˆëìœ¼ë©´ ë¡œê·¸ ì¶œë ¥ 12.10
+            Debug.Log("NoteCnt : " + NoteCnt);} // ì •ìƒ ì‘ë™ ë…¸íŠ¸ë¥¼ ë³´ë‚´ëŠ”ë°ì—ì„œ ë¬¸ì œëŠ” ì—†ìŒ 12.10
+        CreateMoveNoteToHit(_noteIndex);
     }
-    //³ëÆ® º¸³»´Â ¿¹
-    //¸¶µğ¼ö, {±¸¼º};
+    public void NotebyBarintlist(int _bar, int[] _boxlist, int[] _halfboxlist)
+    {
+        StartCoroutine(Bil(_bar, _boxlist, _halfboxlist));
+    }
+    //ë…¸íŠ¸ ë³´ë‚´ëŠ” ì˜ˆ
+    //ë§ˆë””ìˆ˜, {êµ¬ì„±};
     //1,{
     //   1,1,1,1,
     //   1,1,1,1,
     //   1,1,1,1,
     //   1,1,1,1
     //  };
-
-    //2,{
-    //   1,1,1,1,
-    //   1,1,1,1,
-    //   1,1,1,1,
-    //   1,1,1,1
-    //  };
-    public IEnumerator NoteBil(int _bar, int[] _boxlist) // ÀÌ·± ¹æ½ÄÀº ÃÖÀûÈ­¿¡ Ãë¾àÇØ º¸ÀÓ ¸¶µğ°¡ 80°³¸é ÄÚ·çÆ¾À» µ¿½Ã¿¡ 80°³ µ¹¸®´Â ¼ÀÀÌ´Ï
+    public IEnumerator Bil(int _bar, int[] _boxlist, int[] _halfboxlist) //12.10 _halfboxlist ì¶”ê°€ ì›ë˜ boxlist ë‘ ë˜‘ê°™ì€ í˜•ì‹ìœ¼ë¡œ ë„£ì§€ë§Œ ì •ë°• time + 0.5f íƒ€ì´ë°ì˜ ë…¸íŠ¸ë§Œ ì²˜ë¦¬
     {
         //Debug.Log(_bar +"Start" + _boxlist);
         float time = 0;
+        bool half = false;
         bool push1 = false;
         bool push2 = false;
         bool push3 = false;
-        bool push4 = false;
-        float barinbil = (_bar * 4) - 4;
+        bool push4 = false;        
+        bool push1half = false;
+        bool push2half = false;
+        bool push3half = false;
+        bool push4half = false;
+        _bar = (_bar * 4) - 4;
         while (true)
         {
-            //Debug.Log(barinbil);
-            time += Time.deltaTime * Bpm / 60f * 1f;
+            if (isGameOver || isClearTriggered)// ê²Œì„ì˜¤ë²„ê±°ë‚˜ í´ë¦¬ì–´í•˜ë©´ ë£¨í‹´ íƒˆì¶œ 12.10
+                yield break;
+            time += Time.deltaTime * Bpm * 0.005f; //ê·¸ëƒ¥ ì—¬ê¸°ë‹¤ 2f ê³±í•´ë„ ë˜ê¸´í•˜ì§€ë§Œ ê·¸ë§Œí¼ ë§ˆë””ìˆ˜ê°€ 2ë°°ë¡œ ëŠ˜ì–´ì„œ ì½”ë£¨í‹´ì´ ë‘ë°°ë¡œ ëŒì•„ì•¼í•´ì„œ ìƒë‹¹íˆ ë¶€ë‹´ìŠ¤ëŸ½ë‹¤. ê·¸ë¦¬ê³  ë¬¸ì œëŠ” ì´ê±¸ë¡œë„ 2ì¤‘ hitê°€ í•´ê²°ì´ ì•ˆëœë‹¤. 12.10
+            if (time >=0.5)
+                half = true;
             if (time > 1)
             {
                 time %= 1;
-                barinbil--;
+                _bar--;
+                half = false;
             }
-            if (barinbil < 1) // ÀÓ½Ã ¹æÆí ÃÖÀûÈ­ °Ë»ç´Â ´ú ÇÒ °ÍÀÌ´Ù.
+            if (time < 1) //ìµœì í™”1 ê²€ì‚¬ íšŸìˆ˜ ì¤„ì„ 12.10
             {
-                if (barinbil == 0 && !push1)
-                { if (_boxlist[0] == 1) PushNote(2); if (_boxlist[1] == 1) PushNote(3); if (_boxlist[2] == 1) PushNote(1); if (_boxlist[3] == 1) PushNote(0); push1 = true; }
-                if (barinbil == -1 && !push2)
-                { if (_boxlist[4] == 1) PushNote(2); if (_boxlist[5] == 1) PushNote(3); if (_boxlist[6] == 1) PushNote(1); if (_boxlist[7] == 1) PushNote(0); push2 = true; }
-                if (barinbil == -2 && !push3)
-                { if (_boxlist[8] == 1) PushNote(2); if (_boxlist[9] == 1) PushNote(3); if (_boxlist[10] == 1) PushNote(1); if (_boxlist[11] == 1) PushNote(0); push3 = true; }
-                if (barinbil == -3 && !push4)
-                { if (_boxlist[12] == 1) PushNote(2); if (_boxlist[13] == 1) PushNote(3); if (_boxlist[14] == 1) PushNote(1); if (_boxlist[15] == 1) PushNote(0); push4 = true; }
-                if (barinbil == -4) // ÃÖÀûÈ­ ¹«ÇÑÈ÷ °¡´Â°É ¸·À½
-                    yield break;
+                if (_bar == 0 && !push1)
+                { if (_boxlist[0] == 1) PushNote(2); if (_boxlist[1] == 1) PushNote(3); if (_boxlist[2] == 1) PushNote(1); if (_boxlist[3] == 1) PushNote(0); push1 = true; //Debug.Log("push1:" + _bar); 
+                }
+                if (_bar == -1 && !push2)
+                { if (_boxlist[4] == 1) PushNote(2); if (_boxlist[5] == 1) PushNote(3); if (_boxlist[6] == 1) PushNote(1); if (_boxlist[7] == 1) PushNote(0); push2 = true; //Debug.Log("push2:" + _bar); 
+                }
+                if (_bar == -2 && !push3)
+                { if (_boxlist[8] == 1) PushNote(2); if (_boxlist[9] == 1) PushNote(3); if (_boxlist[10] == 1) PushNote(1); if (_boxlist[11] == 1) PushNote(0); push3 = true; //Debug.Log("push3:" + _bar); 
+                }
+                if (_bar == -3 && !push4)
+                { if (_boxlist[12] == 1) PushNote(2); if (_boxlist[13] == 1) PushNote(3); if (_boxlist[14] == 1) PushNote(1); if (_boxlist[15] == 1) PushNote(0); push4 = true; //Debug.Log("push4:" + _bar); 
+                }
+
+                if (half)  // ì´ê³³ì´ ë°˜ë°•ë§Œ ì²˜ë¦¬í•˜ëŠ” êµ¬ê°„ 12.10
+                {
+                    if (_bar == 0 && !push1half)
+                    { if (_halfboxlist[0] == 1) PushNote(2); if (_halfboxlist[1] == 1) PushNote(3); if (_halfboxlist[2] == 1) 
+                            PushNote(1); if (_halfboxlist[3] == 1) PushNote(0); push1half = true; //Debug.Log("push1half:" + _bar); 
+                    }
+                    if (_bar == -1 && !push2half)
+                    { if (_halfboxlist[4] == 1) PushNote(2); if (_halfboxlist[5] == 1) PushNote(3); if (_halfboxlist[6] == 1) 
+                            PushNote(1); if (_halfboxlist[7] == 1) PushNote(0); push2half = true; //Debug.Log("push2half:" + _bar); 
+                    }
+                    if (_bar == -2 && !push3half)
+                    { if (_halfboxlist[8] == 1) PushNote(2); if (_halfboxlist[9] == 1) PushNote(3); if (_halfboxlist[10] == 1) 
+                            PushNote(1); if (_halfboxlist[11] == 1) PushNote(0); push3half = true; //Debug.Log("push3half:" + _bar); 
+                    }
+                    if (_bar == -3 && !push4half)
+                    { if (_halfboxlist[12] == 1) PushNote(2); if (_halfboxlist[13] == 1) PushNote(3); if (_halfboxlist[14] == 1) 
+                            PushNote(1); if (_halfboxlist[15] == 1) PushNote(0); push4half = true; //Debug.Log("push4half:" + _bar); 
+                    }
+                }
+
+                if (_bar < -4)
+                {
+                    yield break; //ìµœì í™”2 _bar ê°€ ê°’ì´ ë¬´í•œíˆ ê°ì†Œí•˜ë©° ì½”ë£¨í‹´ì´ ëŒì•„ê°€ëŠ” ê±¸ ë°©ì§€ 12.10
+                }
+
+                yield return null;
+
             }
-
-            yield return null;
         }
-    }
 
-    //Å×½ºÆ® ¿ë ³ëÆ® ¿©·¯°³ º¸³»±â
-    public bool sampleNotesComming()
-    {
-        int[] pattern1box =
-        {
-            0,0,0,1,
-            0,0,1,1,
-            0,0,0,0,
-            1,1,0,0
-        };
-        int[] pattern2box =
-        {
-            1,0,0,1,
-            0,1,1,0,
-            0,0,0,0,
-            1,0,0,1
-        };
-        int[] pattern3box =
-        {
-            1,0,0,1,
-            0,0,0,0,
-            0,1,1,0,
-            1,0,0,1
-        };
-        int[] pattern4box =
-        {
-            1,0,0,1,
-            0,0,0,0,
-            1,1,1,1,
-            1,0,0,1
-        };
-        int[] pattern5box =
-        {
-            1,0,0,1,
-            0,0,0,0,
-            1,0,1,0,
-            0,0,0,0
-        };
-        int[] pattern6box =
-        {
-            1,0,0,0,
-            1,0,0,0,
-            1,0,0,0,
-            1,0,0,0
-        };
-        NotebyBarintlist(1, pattern1box);
-        NotebyBarintlist(2, pattern2box);
-        NotebyBarintlist(3, pattern3box);
-        NotebyBarintlist(4, pattern4box);
-        NotebyBarintlist(5, pattern5box);
-        NotebyBarintlist(6, pattern6box);
-        NotebyBarintlist(7, pattern6box);
-        NotebyBarintlist(8, pattern6box);
-        NotebyBarintlist(9, pattern6box);
-        NotebyBarintlist(10, pattern5box);
-        NotebyBarintlist(11, pattern5box);
-        NotebyBarintlist(12, pattern5box);
-        NotebyBarintlist(13, pattern5box);
-        NotebyBarintlist(14, pattern2box);
-        NotebyBarintlist(15, pattern4box);
-        NotebyBarintlist(16, pattern2box);
-        NotebyBarintlist(17, pattern3box);
-        //Debug.Log("sampleNotesComming");
-        return true;
-    } 
-    #endregion
-    #region ÆÛºí¸¯ º¯¼ö Á¦¾î
+    }
+    //ì ìˆ˜ 0ìœ¼ë¡œ ì´ˆê¸°í™”
     public void Score0()
     {
         Score = 0;
-    } // ½ºÄÚ¾î 0À¸·Î ÃÊ±âÈ­
+
+        // ì¶”ê°€
+        Stage1UIManager.Instance.SetScore(Score); // ìŠ¤í…Œì´ì§€ ë§¤ë‹ˆì € í˜¸ì¶œ
+        //ScoreManager.Instance.SetScoretext(Score); // ìŠ¤í…Œì´ì§€ ë§¤ë‹ˆì € í˜¸ì¶œ
+    }
+
+    // ì¶”ê°€ í•¨ìˆ˜
+    public void UpdateScore(int value)
+    {
+        Score += value;
+        Stage1UIManager.Instance.SetScore(Score); // ì—…ë°ì´íŠ¸ ì¶”ê°€
+        //ScoreManager.Instance.SetScoretext(Score); // ì—…ë°ì´íŠ¸ ì¶”ê°€
+    }
     public void SetBpm(float _BPM)
     {
         Bpm = _BPM;
-    } // BPM ¼³Á¤
-    public void SetLife5()
-    {
-        lifeCnt = 5;
-    } // ¶óÀÌÇÁ Ä«¿îÆ® 5·Î ÃÊ±âÈ­
-
-    public string Rank() // º¸³½³ëÆ® Á¾ÇÕ ÈÄ Á¡¼ö ºñÀ²¿¡ µû¶ó ·©Å© »êÁ¤ 
-    {
-        if(50 * totalNoteCnt == Score)
-            return ("SSS Rank");        
-        if(50 * totalNoteCnt > Score && 30 * Score >= totalNoteCnt)
-            return ("S Rank");         
-        if(30 * totalNoteCnt > Score && 15 * Score >= totalNoteCnt)
-            return ("A Rank");         
-        if(15 * totalNoteCnt > Score && 10 * Score >= totalNoteCnt)
-            return ("B Rank");               
-        if(totalNoteCnt >= 10 * Score)
-            return ("F Rank");        
-
-
-        // SSS, S ,A ,B
-        else
-            return ("¿À·ù ·©Å©Á¤»ê ¾È‰Î");
     }
-
-    public void Combo99() // ÄŞº¸ 99·Î ¸¸µé±â 
+    public bool sampleNotesComming(AudioSource _audioSource)
     {
-        ComboCnt = 99;
-    }
-
-    #endregion
-    #region ÇÇ¹öÅ¸ÀÓ
-    public IEnumerator StartFeverTime()
-    {
-        float feverTimeCnt = 0;
-        isFever = true;
-        while (feverTimeCnt < 3)
         {
-            feverTimeCnt += Time.deltaTime;
-            //Debug.Log("ÇÇ¹öÅ¸ÀÓ!");
-            yield return null;
+
+            int[] pattern1box =
+            {
+            1,0,0,0,
+            0,1,0,0,
+            0,0,0,1,
+            0,0,1,1
+            };
+            int[] pattern2box =
+            {
+            0,1,1,0,
+            1,0,0,1,
+            0,1,1,0,
+            0,0,1,0
+            };
+            int[] pattern3box =
+            {
+            1,1,1,1,
+            1,0,1,0,
+            0,1,0,0,
+            0,0,1,0
+            };
+            int[] pattern4box =
+            {
+            1,1,0,0,
+            0,1,1,0,
+            0,0,1,1,
+            0,1,0,0
+            };
+            int[] pattern5box =
+            {
+            0,1,1,0,
+            0,0,1,0,
+            1,0,0,1,
+            0,1,0,0
+            };
+            int[] pattern6box =
+            {
+            1,0,0,1,
+            0,0,0,1,
+            1,0,0,1,
+            0,1,1,0
+            };
+            int[] pattern7box =
+            {
+            1,0,0,1,
+            0,0,1,0,
+            0,1,1,0,
+            0,1,0,0
+            };
+            int[] pattern8box =
+            {
+            1,0,0,1,
+            0,1,0,0,
+            0,0,1,0,
+            0,1,0,1
+            };
+            int[] pattern9box =
+            {
+            1,1,1,1,
+            1,1,0,0,
+            0,0,1,1,
+            1,1,0,1
+            };
+            int[] pattern10box =
+            {
+            1,1,1,1,
+            0,1,1,0,
+            0,1,1,0,
+            1,1,1,1
+            };            
+            int[] pattern11box =
+            {
+            1,0,0,0,
+            0,0,1,0,
+            0,0,0,0,
+            0,0,0,0
+            };
+            _audioSource.Play();
+            for (int i = 0; i < 80; i += 8)
+            {
+                NotebyBarintlist(i, pattern1box, pattern11box);
+                if (i == 16)
+                    NotebyBarintlist(i + 1, pattern10box, pattern11box);
+                else
+                    NotebyBarintlist(i + 1, pattern2box, pattern1box);
+                NotebyBarintlist(i + 2, pattern3box, pattern11box);
+                NotebyBarintlist(i + 3, pattern4box, pattern11box);
+                NotebyBarintlist(i + 4, pattern5box, pattern11box);
+                NotebyBarintlist(i + 5, pattern6box, pattern11box);
+                if(i == 40)
+                    NotebyBarintlist(i + 6, pattern9box, pattern1box);
+                else
+                    NotebyBarintlist(i + 6, pattern7box, pattern11box);
+                if(i == 32 || i == 64)
+                    NotebyBarintlist(i + 7, pattern10box, pattern1box);
+                else
+                    NotebyBarintlist(i + 7, pattern8box, pattern11box);
+            }
         }
-        if (feverTimeCnt >= 3)
-        {
-            Debug.Log("ÇÇ¹öÅ¸ÀÓ³¡~");
-            isFever = false;
-        }
+        //Debug.Log("sampleNotesComming");
+        return true;
     }
 
-    public void feverTimeHit() // ÇÇ¹öÅ¸ÀÓÈ÷Æ® ÇÔ¼ö ½ÇÇàÇÏ¸é 1Á¡ Ãß°¡
+    public bool CheatLifeNtime() // ë¼ì´í”„ ì¹˜íŠ¸í‚¤ ì¶”ê°€ 12.10
     {
-            Score += 1;
-        Debug.Log(Score);
+        isCheat=!isCheat;
+        Debug.Log("Cheat On/Off");
+        clearTimer = 10f;
+        if (isCheat)
+            return true;
+        else 
+            return false;
     }
-    #endregion
-    #region ÆÛºí¸¯ º¯¼ö È®ÀÎ
-    public bool IsFeverTime
-    {
-        get { return isFever; }  // °ªÀ» ¹İÈ¯
-    }
-
-    public int ChecklifeCnt
-    {
-        get { return lifeCnt; }  // °ªÀ» ¹İÈ¯
-    }
-    #endregion
     #endregion
 }

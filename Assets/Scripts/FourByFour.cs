@@ -2,153 +2,65 @@ using UnityEngine;
 
 public class FourByFour : MonoBehaviour
 {
+
     [SerializeField]
     private ONEShin_UINoteManager1 UINMg = null;
     [SerializeField]
-    private AudioSource audioSource = null;
+    //private AudioClip bgm = null;
+    public AudioSource audioSource = null;
 
     private void Awake()
     {
-        audioSource = GetComponentInChildren<AudioSource>();
+        audioSource = GetComponentInChildren<AudioSource>(); //12.10 수정 
         UINMg = GetComponentInChildren<ONEShin_UINoteManager1>();
     }
     private void Start()
     {
         UINMg.Score0();
-        UINMg.SetBpm(220); // 곡은 110BPM으로 측정됌 현재 만든 코루틴이 4분음표 첫만 가능해서 220bpm 으로 
-
-        //UINMg.sampleNotesComming();
-
+        UINMg.SetBpm(220); //220 BPM 으로설정 // 110 이 맞으나 정박노트만 만들수 밖에 없는 문제가 생겨 (반박자노트 생성 불가) 임시방편으로 220으로 맞춤
+        UINMg.sampleNotesComming(audioSource);
+        //audioSource.clip = bgm;
         //audioSource.Play();
     }
 
     private void Update()
     {
         // 노트 히트
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.S)) //GetKey로 하면 절대 안됌!!!!!  GetKeyDown!!!!!! 중요함!!!!!!
             UINMg.HitNote(2);
         if (Input.GetKeyDown(KeyCode.W))
             UINMg.HitNote(3);
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.I))
             UINMg.HitNote(1);
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.K))
             UINMg.HitNote(0);
 
-        // 디버그용 노트 푸시
         if (Input.GetKeyDown(KeyCode.A))
-            UINMg.PushNote(2);
-        if (Input.GetKeyDown(KeyCode.S))
-            UINMg.PushNote(3);
-        if (Input.GetKeyDown(KeyCode.D))
-            UINMg.PushNote(1);
-        if (Input.GetKeyDown(KeyCode.F))
-            UINMg.PushNote(0);
-        // 디버그용 콤보 99로 만들기
-        //if (Input.GetKeyDown(KeyCode.H))
-        //UINMg.AddCombo99();
+            UINMg.CheatLifeNtime();
+        
 
+            // 디버그용 노트 푸시
         if (Input.GetKeyDown(KeyCode.Z))
-        {
-            int[] pattern1box =
-            {
-            1,0,0,0,
-            0,0,0,0,
-            0,0,0,0,
-            1,0,0,1
-            };
-            int[] pattern2box =
-            {
-            0,1,1,0,
-            0,0,0,0,
-            0,0,1,0,
-            0,0,0,0
-            };
-            int[] pattern3box =
-            {
-            1,0,0,0,
-            0,0,0,1,
-            0,0,0,0,
-            0,0,0,0
-            };
-            int[] pattern4box =
-            {
-            1,1,0,0,
-            0,0,0,0,
-            0,0,1,1,
-            0,0,0,0
-            };
-            int[] pattern5box =
-            {
-            0,1,1,0,
-            0,0,0,0,
-            1,0,0,1,
-            0,0,0,0
-            };
-            int[] pattern6box =
-            {
-            1,1,1,1,
-            0,0,0,0,
-            1,0,0,1,
-            0,0,0,0
-            };
-            int[] pattern7box =
-            {
-            1,0,0,1,
-            0,0,0,0,
-            0,1,1,0,
-            0,0,0,0
-            };
-            int[] pattern8box =
-            {
-            1,0,0,0,
-            0,1,0,0,
-            0,0,1,0,
-            0,0,0,1
-            };
-            int[] pattern9box =
-            {
-            1,0,0,0,
-            0,0,0,0,
-            1,0,0,0,
-            0,0,0,0
-            };
-            int[] pattern10box =
-            {
-            1,0,0,0,
-            0,0,0,0,
-            1,0,0,0,
-            0,0,0,0
-            };
-            audioSource.Play();
-            //for (int i = 0; i < 85;  i++)   
-            //UINMg.NotebyBarintlist(i,pattern1box);
-            //8마디 9번 반복
-            for (int i = 0; i < 80; i += 8)
-            {
-                UINMg.NotebyBarintlist(i, pattern1box);
-                if (i == 8 && i == 24)//특정 마디 다른 패턴 사용 예제
-                {
-                    UINMg.NotebyBarintlist(i + 1, pattern9box); // 특정 패턴
-                }
-                else
-                {
-                    UINMg.NotebyBarintlist(i + 1, pattern2box); //원래 패턴
-                }
-                UINMg.NotebyBarintlist(i + 2, pattern3box);   
-                UINMg.NotebyBarintlist(i + 3, pattern4box);   
-                UINMg.NotebyBarintlist(i + 4, pattern5box);   
-                UINMg.NotebyBarintlist(i + 5, pattern6box);   
-                UINMg.NotebyBarintlist(i + 6, pattern7box);   
-                UINMg.NotebyBarintlist(i + 7, pattern8box);   
-            }
-            //마지막 5마디 //마지막을 이렇게 안하고 위 반복문으로 돌리면 5마디만 도는 게 아니고 8마디 그대로 다 돌리니까 주의
-            UINMg.NotebyBarintlist(80, pattern1box);
-            UINMg.NotebyBarintlist(81, pattern2box);
-            UINMg.NotebyBarintlist(82, pattern3box);
-            UINMg.NotebyBarintlist(83, pattern7box);
-            UINMg.NotebyBarintlist(84, pattern7box);
-        }
-        //if (Input.GetKeyDown(KeyCode.X))
+            UINMg.HitNote(2);
+        if (Input.GetKeyDown(KeyCode.X))
+            UINMg.HitNote(3);
+        if (Input.GetKeyDown(KeyCode.C))
+            UINMg.HitNote(1);
+        if (Input.GetKeyDown(KeyCode.V))
+            UINMg.HitNote(0);
+        
+        if(UINMg.isGameover) // isGameover == true 면 오디오를 멈춤 12.10
+            audioSource.Stop();
 
+
+        //// 디버그용 롱노트 푸시
+        //if (Input.GetKeyDown(KeyCode.U))
+        //    UINMg.PushLongNote(2);
+        //if (Input.GetKeyDown(KeyCode.I))
+        //    UINMg.PushLongNote(3);
+        //if (Input.GetKeyDown(KeyCode.O))
+        //    UINMg.PushLongNote(1);
+        //if (Input.GetKeyDown(KeyCode.P))
+        //    UINMg.PushLongNote(0);
     }
 }
