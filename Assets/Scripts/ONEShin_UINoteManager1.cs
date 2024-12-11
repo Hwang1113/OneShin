@@ -157,16 +157,6 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         }
     }
 
-    private void FeverModeHit() //12.01 피버모드 히트당 점수 +1 
-    {
-        int FeverScore = 1;
-        if (0 <= feverTime && feverTime <  5f)
-        {
-            scoreManager.AddScore(FeverScore);
-            stage1UIManager.ShowClearUI();
-        }
-    }
-
     #region private
     // 노트를 생성하는 함수 (Q, W, E, R에 맞게)
 
@@ -220,12 +210,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         // 추가2
         string judgeResult = "Miss"; // 기본값은 Miss 
         int scoreToAdd = 0; // 점수 초기화
-        if (isFever)
-        {
-            FeverModeHit();
-        }
-        else
-        {
+        
             // 다른 노트가 눌렸을 때 패널티 적용
             /*
             if (Stoptimings[_noteIndex] < 0.4f)
@@ -297,7 +282,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
                     scoreManager.AddScore(scoreToAdd); // ScoreManager에 점수 전달
                 }
             }
-        }
+        
     }
 
     public void PushNote(int _noteIndex)
@@ -337,14 +322,20 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
         while (true)
         {
             if (isGameOver || isClearTriggered)// 게임오버거나 클리어하면 루틴 탈출 12.10
+            {
+                Debug.Log("루틴탈출인가1");
                 yield break;
+                
+            }
             time += Time.deltaTime * Bpm * 0.005f; //그냥 여기다 2f 곱해도 되긴하지만 그만큼 마디수가 2배로 늘어서 코루틴이 두배로 돌아야해서 상당히 부담스럽다. 그리고 문제는 이걸로도 2중 hit가 해결이 안된다. 12.10
             if (time >=0.5)
                 half = true;
             if (time > 1)
             {
+
                 time %= 1;
                 _bar--;
+                Debug.Log("Bar" + _bar);
                 half = false;
             }
             if (time < 1) //최적화1 검사 횟수 줄임 12.10
@@ -384,6 +375,7 @@ public class ONEShin_UINoteManager1 : MonoBehaviour
 
                 if (_bar < -4)
                 {
+                    Debug.Log("루틴탈출인가2");
                     yield break; //최적화2 _bar 가 값이 무한히 감소하며 코루틴이 돌아가는 걸 방지 12.10
                 }
 
